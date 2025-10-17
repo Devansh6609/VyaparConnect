@@ -19,7 +19,8 @@ import Modal from "./ui/Modal";
 import AddProductForm from "./AddProductForm";
 import EditProductForm from "./EditProductForm";
 import QuotationPreviewModal from "@/components/QuotationPreviewModal";
-import { motion, AnimatePresence } from "framer-motion";
+// FIX: Add Variants type to fix type inference issues
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useSession } from "next-auth/react";
 
 interface RightPanelProps {
@@ -33,12 +34,11 @@ interface RightPanelProps {
 
 type ViewId = 'main_menu' | 'products' | 'quotations' | 'new_quotation' | 'billing' | 'master_customer_details' | 'order_history' | 'new_order' | 'order_summary' | 'order_billing' | 'new_reminder';
 
-// FIX: Removed `ease` property from transitions to resolve TypeScript type inference errors with framer-motion.
-// The animation will use the default easing.
-const viewTransitionVariants = {
+// FIX: Add explicit Variants type to fix type inference issues
+const viewTransitionVariants: Variants = {
     initial: { opacity: 0, y: 10 },
-    enter: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-    exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
+    exit: { opacity: 0, y: -10, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } },
 };
 
 const menuContainerVariants = {
@@ -48,9 +48,10 @@ const menuContainerVariants = {
         },
     },
 };
-const menuItemVariants = {
+// FIX: Add explicit Variants type to fix type inference issues
+const menuItemVariants: Variants = {
     hidden: { y: 15, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
+    visible: { y: 0, opacity: 1, transition: { ease: 'easeOut', duration: 0.3 } },
 };
 
 const RightPanel: React.FC<RightPanelProps> = ({

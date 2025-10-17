@@ -11,7 +11,8 @@ const VyaparAIFab: React.FC = () => {
         <motion.button
             onClick={openModal}
             className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 rounded-full text-white flex items-center justify-center shadow-lg z-40"
-            // FIX: Removed `whileHover` and `whileTap` props due to TypeScript error. This may affect animations.
+            whileHover={{ scale: 1.1, rotate: 15 }}
+            whileTap={{ scale: 0.9 }}
             aria-label="Open Vyapar AI Assistant"
             title="Vyapar AI"
         >

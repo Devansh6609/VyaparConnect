@@ -1,4 +1,6 @@
 
+
+
 "use client";
 import React, { useState, useEffect } from 'react';
 import type { Quotation } from '../../types';
@@ -6,7 +8,7 @@ import { Plus, Send, RefreshCw, Edit, Trash2, Loader2, Clock } from 'lucide-reac
 import { format } from 'date-fns';
 import Badge from '../ui/Badge';
 import Modal from '../ui/Modal';
-import { motion, type Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface QuotationHistoryProps {
     contactId: string;
@@ -31,20 +33,15 @@ const getStatusColor = (status: Quotation['status']): 'green' | 'gray' | 'red' |
     }
 };
 
-const listContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.05,
-        },
-    },
+const listVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.07 } }
+};
+const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
 };
 
-const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-};
 
 const QuotationHistory: React.FC<QuotationHistoryProps> = ({ contactId, onNewQuote, onBillQuote, onSendDraft, onSetFollowUp }) => {
     const [quotations, setQuotations] = useState<Quotation[]>([]);
@@ -150,15 +147,15 @@ const QuotationHistory: React.FC<QuotationHistoryProps> = ({ contactId, onNewQuo
             ) : (
                 <motion.ul
                     className="space-y-3"
-                    variants={listContainerVariants}
+                    variants={listVariants}
                     initial="hidden"
                     animate="visible"
                 >
                     {quotations.map(q => (
                         <motion.li
                             key={q.id}
-                            className="p-3 border dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50"
                             variants={itemVariants}
+                            className="p-3 border dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50"
                         >
                             <div className="flex justify-between items-start">
                                 <div>

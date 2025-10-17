@@ -75,8 +75,10 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
                 </g>
 
                 {/* Line and Points */}
-                {/* FIX: Removed framer-motion props (initial, animate, transition) due to TypeScript errors. */}
                 <motion.path
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, ease: 'easeInOut' }}
                     d={pathData}
                     fill="none"
                     stroke="currentColor"
@@ -94,11 +96,12 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
                                 onMouseOver={(e) => handleMouseOver(e, data[index])}
                                 onMouseLeave={() => setTooltip(null)}
                             />
-                            {/* FIX: Removed framer-motion props (initial, animate, transition) due to TypeScript errors. */}
                             <motion.circle
+                                initial={{ r: 0 }}
+                                animate={{ r: 4 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
                                 cx={point.x}
                                 cy={point.y}
-                                r="4"
                                 fill="currentColor"
                                 className="text-blue-500 pointer-events-none"
                             />
@@ -113,8 +116,11 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
             </svg>
             <AnimatePresence>
                 {tooltip && (
-                    // FIX: Removed framer-motion props (initial, animate, exit, transition) due to TypeScript errors.
                     <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
                         style={{
                             position: 'fixed',
                             top: tooltip.y,

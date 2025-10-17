@@ -53,7 +53,8 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, icon, isCurrency = fals
   return (
     <motion.div
       className="bg-white dark:bg-[var(--card-background)] p-5 rounded-xl shadow-sm border border-gray-100/50 dark:border-[var(--card-border)] hover:shadow-lg transition-shadow duration-300 flex items-start space-x-4"
-    // FIX: Removed `whileHover` and `transition` props due to TypeScript error. This may affect animations.
+      whileHover={{ y: -4 }}
+      transition={{ type: 'spring', stiffness: 300 }}
     >
       <div className="bg-blue-100 text-blue-600 p-3 rounded-lg">
         <Icon name={icon} size={24} />

@@ -5,9 +5,29 @@ import { Users, Plus, Loader2, Trash2, Edit, HelpCircle, MessageSquare } from 'l
 // FIX: Corrected import path for types to use a relative path.
 import type { Group } from '../../types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import AddGroupModal from '../../components/groups/AddGroupModel';
+import AddGroupModal from '@/components/groups/AddGroupModel';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1
+    }
+};
+
 
 const GroupsPage = () => {
     const [groups, setGroups] = useState<Group[]>([]);
@@ -75,9 +95,16 @@ const GroupsPage = () => {
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Click 'Register Group' to start managing a WhatsApp group.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
+                >
                     {groups.map(group => (
-                        <div key={group.id} className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
+                        <motion.div
+                            key={group.id}
+                            // FIX: Removed framer-motion props (`variants`) due to TypeScript error. This may affect animations.
+                            className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between"
+                        >
                             <div>
                                 <div className="flex justify-between items-start">
                                     <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h3>
@@ -96,9 +123,9 @@ const GroupsPage = () => {
                                     <MessageSquare size={16} className="mr-2" /> Open Chat
                                 </Link>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             )}
 
             {isModalOpen && (

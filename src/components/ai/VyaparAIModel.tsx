@@ -227,7 +227,10 @@ const VyaparAIModal: React.FC = () => {
             {isOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <motion.div
-                        // FIX: Removed framer-motion props (`initial`, `animate`, `exit`, `transition`) due to TypeScript error. This may affect animations.
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
                         className="w-full max-w-2xl h-[80vh] bg-white dark:bg-gray-800 rounded-lg shadow-2xl border dark:border-gray-700 flex flex-col"
                     >
                         <header className="p-4 border-b dark:border-gray-700 flex justify-between items-center flex-shrink-0">

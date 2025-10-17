@@ -1,4 +1,5 @@
 
+
 // src/components/dashboard/AiInsights.tsx
 "use client";
 
@@ -59,8 +60,8 @@ const AiInsights: React.FC<AiInsightsProps> = ({ summary }) => {
     return (
         <motion.div
             className="p-5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/40 border border-blue-200 dark:border-blue-800/50 shadow-sm"
-            whileHover={{ y: -4 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+            whileHover={{ y: -2 }}
+            transition={{ type: 'spring', stiffness: 300 }}
         >
             <div className="flex items-center mb-3">
                 <Icon name="sparkles" className="text-blue-600 dark:text-blue-400" />

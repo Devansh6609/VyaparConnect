@@ -120,7 +120,10 @@ export default function CommandPalette() {
                     onClick={() => setIsOpen(false)}
                 >
                     <motion.div
-
+                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                        transition={{ duration: 0.2 }}
                         className="w-full max-w-xl bg-white dark:bg-gray-800 rounded-lg shadow-2xl border dark:border-gray-700 overflow-hidden"
                         onClick={e => e.stopPropagation()}
                         onKeyDown={handleKeyDown}

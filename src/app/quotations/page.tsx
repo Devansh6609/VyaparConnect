@@ -66,9 +66,7 @@ const QuotationsPage: React.FC = () => {
     return (
         <div className="p-6 md:p-8 bg-gray-50/50 dark:bg-transparent min-h-full">
             <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                // FIX: Removed framer-motion props (`initial`, `animate`, `transition`) due to TypeScript error. This may affect animations.
                 className="flex justify-between items-center mb-6"
             >
                 <div>
@@ -89,11 +87,8 @@ const QuotationsPage: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <motion.div
-                    layout
+                    // FIX: Removed framer-motion props (`layout`, `variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
                     className="lg:col-span-3 space-y-4"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
                 >
                     <AnimatePresence>
                         {filteredTransactions.length > 0 ? (
@@ -105,7 +100,7 @@ const QuotationsPage: React.FC = () => {
                                 />
                             ))
                         ) : (
-                            <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-16 bg-white rounded-lg border">
+                            <motion.div className="text-center py-16 bg-white rounded-lg border">
                                 <Icon name="fileText" size={40} className="mx-auto text-gray-300" />
                                 <h3 className="mt-2 text-lg font-medium text-gray-700">No Quotations Found</h3>
                                 <p className="mt-1 text-sm text-gray-500">

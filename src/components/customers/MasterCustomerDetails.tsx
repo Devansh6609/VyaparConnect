@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -14,15 +15,8 @@ interface MasterCustomerDetailsProps {
     onPromoted: () => void;
 }
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0 },
-};
+const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
+const itemVariants = { hidden: { y: 15, opacity: 0 }, visible: { y: 0, opacity: 1 } };
 
 
 const MasterCustomerDetails: React.FC<MasterCustomerDetailsProps> = ({ contact, onPromoted }) => {
@@ -147,11 +141,11 @@ const MasterCustomerDetails: React.FC<MasterCustomerDetailsProps> = ({ contact, 
     if (isEditing) {
         return (
             <motion.form
-                onSubmit={handleSaveChanges}
-                className="p-4 space-y-4"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
+                onSubmit={handleSaveChanges}
+                className="p-4 space-y-4"
             >
                 <motion.h3 variants={itemVariants} className="font-semibold flex items-center text-yellow-500">
                     <Star size={18} className="mr-2 fill-current" />
@@ -190,12 +184,12 @@ const MasterCustomerDetails: React.FC<MasterCustomerDetailsProps> = ({ contact, 
     // Read-only view
     return (
         <motion.div
-            className="p-4 space-y-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
+            className="p-4 space-y-4"
         >
-            <motion.div variants={itemVariants} className="space-y-3">
+            <motion.div variants={containerVariants} className="space-y-3">
                 <motion.div variants={itemVariants}>
                     <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">Tags</label>
                     <div className="flex flex-wrap gap-2 items-center mt-1">

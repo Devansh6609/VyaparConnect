@@ -1,4 +1,3 @@
-
 // src/components/orders/OrderHistory.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { Plus, Send, RefreshCw, Edit, Trash2, Loader2, Package } from 'lucide-re
 import { format } from 'date-fns';
 import OrderStatusBadge from './OrderStatusBadge';
 import Modal from '../ui/Modal';
-import { motion, type Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface OrderHistoryProps {
     contactId: string;
@@ -15,15 +14,15 @@ interface OrderHistoryProps {
     onManagePayments: (order: Order) => void;
 }
 
-const listContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+const listVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.07 } }
+};
+const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
 };
 
-const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-};
 
 const OrderHistory: React.FC<OrderHistoryProps> = ({ contactId, onNewOrder, onManagePayments }) => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -82,15 +81,15 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ contactId, onNewOrder, onMa
             ) : (
                 <motion.ul
                     className="space-y-3"
-                    variants={listContainerVariants}
+                    variants={listVariants}
                     initial="hidden"
                     animate="visible"
                 >
                     {orders.map(order => (
                         <motion.li
                             key={order.id}
-                            className="p-3 border dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50"
                             variants={itemVariants}
+                            className="p-3 border dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50"
                         >
                             <div className="flex justify-between items-start">
                                 <div>

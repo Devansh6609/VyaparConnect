@@ -72,11 +72,12 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle, onUp
 
     return (
         <motion.div
-            // FIX: Removed `layout` and `variants` props due to TypeScript error. This may affect animations.
+            layout
+            variants={itemVariants}
             className="bg-white dark:bg-[var(--card-background)] rounded-lg shadow-sm border dark:border-[var(--card-border)] overflow-hidden"
         >
             <motion.div
-                // FIX: Removed `layout` prop due to TypeScript error. This may affect animations.
+                layout
                 className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
                 onClick={onToggle}
             >
@@ -90,8 +91,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle, onUp
                     </div>
                     <div className="md:col-span-2 flex justify-between md:justify-end items-center">
                         <OrderStatusBadge status={order.status} />
-                        <motion.div>
-                            <ChevronDown size={20} className={`ml-4 text-gray-400`} />
+                        <motion.div layout="position">
+                            <ChevronDown size={20} className={`ml-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                         </motion.div>
                     </div>
                 </div>
@@ -113,7 +114,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle, onUp
                 {isExpanded && (
                     <motion.section
                         key="content"
-                    // FIX: Removed framer-motion props (`initial`, `animate`, `exit`, `variants`, `transition`) due to TypeScript error. This may affect animations.
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{
+                            hidden: { opacity: 0, height: 0 },
+                            visible: { opacity: 1, height: 'auto' }
+                        }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
                         <div className="p-4 bg-gray-50 dark:bg-gray-800/60 border-t dark:border-[var(--card-border)] text-sm">
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">

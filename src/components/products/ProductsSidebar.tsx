@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Product } from '../../types';
 import Icon from '@/components/ui/Icon';
-// FIX: Removed `type Variants` import as it's not exported, causing errors.
 import { motion } from 'framer-motion';
 
 interface ProductsSidebarProps {
@@ -57,12 +56,15 @@ const ProductsSidebar: React.FC<ProductsSidebarProps> = ({
   return (
     <motion.div
       className="p-2"
-    // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
     >
       {products.map((product) => (
         <motion.div
           key={product.id}
-          // FIX: Removed framer-motion props (`variants`, `layout`) due to TypeScript error. This may affect animations.
+          variants={itemVariants}
+          layout
           className="p-2 mb-2 border dark:border-gray-700 rounded-lg flex items-center hover:bg-gray-50 dark:hover:bg-gray-700/50"
         >
           <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover rounded-md mr-3 flex-shrink-0" />

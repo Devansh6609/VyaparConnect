@@ -84,13 +84,13 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
 
                         return (
                             <g key={item.label}>
-                                {/* FIX: Removed framer-motion props (initial, animate, transition) due to TypeScript errors. */}
                                 <motion.rect
+                                    initial={{ height: 0, y: chartHeight }}
+                                    animate={{ height: barHeight, y: y }}
+                                    transition={{ duration: 0.5, delay: index * 0.05, type: 'spring', stiffness: 100 }}
                                     x={x}
-                                    y={y}
                                     width={barWidth}
                                     rx={3}
-                                    height={barHeight}
                                     fill="currentColor"
                                     className="text-blue-500 hover:text-blue-700 dark:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                     onMouseOver={(e) => handleMouseOver(e, item)}
@@ -108,8 +108,11 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
             </svg>
             <AnimatePresence>
                 {tooltip && (
-                    // FIX: Removed framer-motion props (initial, animate, exit, transition) due to TypeScript errors.
                     <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
                         style={{
                             position: 'fixed',
                             top: tooltip.y,

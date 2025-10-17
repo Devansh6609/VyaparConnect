@@ -6,7 +6,7 @@ import type { Contact, Message, ProductImage } from "../types";
 import ChatInput from "./ChatInput";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import ImageGalleryModal from "./ImageGalleryModal";
-import SummaryModal from "../components/SummaryModel";
+import SummaryModal from "./SummaryModel";
 import { MoreVertical, Phone, Download, Reply, PlusCircle, Clock, X, Check, CheckCheck, Star, Loader2, BookText } from "lucide-react";
 import { format } from "date-fns";
 import Icon from "@/components/ui/Icon";

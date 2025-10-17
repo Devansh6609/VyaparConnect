@@ -9,29 +9,19 @@ import Icon from '../ui/Icon';
 type WorkflowType = 'QUOTATION_FOCUSED' | 'ORDER_FOCUSED' | 'HYBRID';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
-// FIX: Removed animation props due to framer-motion type errors.
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.15,
-            delayChildren: 0.3,
-        }
-    }
+const wizardVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-// FIX: Removed animation props due to framer-motion type errors.
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-        y: 0,
-        opacity: 1,
-        transition: {
-            type: 'spring',
-            stiffness: 100
-        }
-    }
+const optionsContainerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } }
+};
+
+const optionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
 };
 
 const OnboardingWizard: React.FC = () => {
@@ -66,11 +56,10 @@ const OnboardingWizard: React.FC = () => {
     return (
         <div className="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 flex items-center justify-center">
             <div className="text-center p-8 max-w-4xl mx-auto">
-                {/* FIX: Removed animation props due to framer-motion type errors. */}
                 <motion.div
-
-
-
+                    variants={wizardVariants}
+                    initial="hidden"
+                    animate="visible"
                 >
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">
                         Welcome, {session?.user?.name}!
@@ -83,17 +72,16 @@ const OnboardingWizard: React.FC = () => {
                 {error && <p className="mt-4 text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
 
                 {isLoading ? <LoadingSpinner /> : (
-                    // FIX: Removed animation props due to framer-motion type errors.
                     <motion.div
                         className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6"
-
-
-
+                        variants={optionsContainerVariants}
+                        initial="hidden"
+                        animate="visible"
                     >
-                        {/* FIX: Removed animation props due to framer-motion type errors. */}
                         <motion.button
                             onClick={() => handleSelectWorkflow('QUOTATION_FOCUSED')}
-
+                            variants={optionVariants}
+                            whileHover={{ y: -5 }}
                             className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md border dark:border-gray-700 hover:shadow-lg hover:border-blue-500 transition-all text-left"
                         >
                             <Icon name="FileText" size={32} className="text-green-500" />
@@ -103,10 +91,10 @@ const OnboardingWizard: React.FC = () => {
                             </p>
                         </motion.button>
 
-                        {/* FIX: Removed animation props due to framer-motion type errors. */}
                         <motion.button
                             onClick={() => handleSelectWorkflow('ORDER_FOCUSED')}
-
+                            variants={optionVariants}
+                            whileHover={{ y: -5 }}
                             className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md border dark:border-gray-700 hover:shadow-lg hover:border-blue-500 transition-all text-left"
                         >
                             <Icon name="Package" size={32} className="text-orange-500" />
@@ -116,10 +104,10 @@ const OnboardingWizard: React.FC = () => {
                             </p>
                         </motion.button>
 
-                        {/* FIX: Removed animation props due to framer-motion type errors. */}
                         <motion.button
                             onClick={() => handleSelectWorkflow('HYBRID')}
-
+                            variants={optionVariants}
+                            whileHover={{ y: -5 }}
                             className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md border dark:border-gray-700 hover:shadow-lg hover:border-blue-500 transition-all text-left"
                         >
                             <Icon name="Combine" size={32} className="text-purple-500" />

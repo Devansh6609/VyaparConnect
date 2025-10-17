@@ -48,7 +48,9 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
     return (
         <div className="p-6 md:p-8 bg-gray-50/50 dark:bg-gray-900/50 min-h-screen">
             <motion.div
-            // FIX: Removed framer-motion props (`initial`, `animate`, `variants`) due to TypeScript error. This may affect animations.
+                initial="hidden"
+                animate="visible"
+                variants={itemVariants}
             >
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Dashboard</h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Here's a snapshot of your business activity.</p>
@@ -60,12 +62,14 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
 
             <motion.div
                 className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
             >
-                <KpiCard title="Today's Revenue" value={data.totalRevenue} icon="dollarSign" isCurrency />
-                <KpiCard title="New Customers Today" value={data.newCustomers} icon="userPlus" />
-                <KpiCard title="Today's Orders" value={data.totalOrders} icon="package" />
-                <KpiCard title="Pending Payments" value={data.pendingPayments} icon="creditCard" isCurrency />
+                <motion.div variants={itemVariants}><KpiCard title="Today's Revenue" value={data.totalRevenue} icon="dollarSign" isCurrency /></motion.div>
+                <motion.div variants={itemVariants}><KpiCard title="New Customers Today" value={data.newCustomers} icon="userPlus" /></motion.div>
+                <motion.div variants={itemVariants}><KpiCard title="Today's Orders" value={data.totalOrders} icon="package" /></motion.div>
+                <motion.div variants={itemVariants}><KpiCard title="Pending Payments" value={data.pendingPayments} icon="creditCard" isCurrency /></motion.div>
             </motion.div>
 
             <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">

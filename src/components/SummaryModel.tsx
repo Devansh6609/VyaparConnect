@@ -13,22 +13,6 @@ interface SummaryModalProps {
     isLoading: boolean;
 }
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.03,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0 },
-};
-
-
 // Helper component to parse and render formatted summary lines
 const LineRenderer: React.FC<{ line: string }> = ({ line }) => {
     if (line.trim() === '') {
@@ -89,13 +73,13 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, summary, i
                     </div>
                 ) : (
                     <motion.div
-                        variants={containerVariants}
+                        className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+                        variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
                         initial="hidden"
                         animate="visible"
-                        className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
                     >
                         {summary.split('\n').map((line, index) => (
-                            <motion.div key={index} variants={itemVariants}>
+                            <motion.div key={index} variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
                                 <LineRenderer line={line} />
                             </motion.div>
                         ))}
