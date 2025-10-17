@@ -1,0 +1,432 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------
+// ENUMS
+// -------------------------------------
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  CONFIRMED
+  BILLED
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderItemStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum ContactStage {
+  NEW_LEAD
+  CONTACTED
+  QUOTATION_SENT
+  PAYMENT_PENDING
+  COMPLETED
+  LOST
+}
+
+enum WorkflowType {
+  QUOTATION_FOCUSED
+  ORDER_FOCUSED
+  HYBRID
+}
+
+enum MessageFrom {
+  business
+  customer
+}
+
+enum MessageType {
+  text
+  image
+  document
+  product
+  unsupported
+}
+
+enum MessageStatus {
+  pending
+  sent
+  delivered
+  read
+  failed
+  received
+}
+
+enum ReminderStatus {
+  PENDING
+  COMPLETED
+}
+
+enum BroadcastStatus {
+  PENDING
+  SENDING
+  COMPLETED
+  FAILED
+}
+
+enum BroadcastRecipientStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// -------------------------------------
+// MODELS
+// -------------------------------------
+
+model User {
+  id                      String    @id @default(cuid())
+  name                    String?
+  email                   String?   @unique
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  hasCompletedOnboarding  Boolean   @default(false)
+  accounts                Account[]
+  sessions                Session[]
+  settings                Settings?
+  contacts                Contact[]
+  products                Product[]
+  quotations              Quotation[]
+  orders                  Order[]
+  reminders               Reminder[]
+  broadcasts              Broadcast[]
+  groups                  Group[]
+  tags                    Tag[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Settings {
+  id                        String        @id @default(cuid())
+  userId                    String        @unique
+  user                      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName               String?
+  companyAddress            String?
+  companyLogoUrl            String?
+  bankName                  String?
+  bankAccountNumber         String?
+  bankIfscCode              String?
+  upiQrCodeUrl              String?
+  razorpayKeyId             String?
+  razorpayKeySecret         String?
+  primaryWorkflow           WorkflowType? @default(HYBRID)
+  geminiApiKey              String?
+  whatsappPhoneNumberId     String?
+  whatsappBusinessAccountId String?
+  whatsappAccessToken       String?
+  whatsappVerifyToken       String?       @unique
+}
+
+model Contact {
+  id                  String                 @id @default(cuid())
+  name                String
+  phone               String                 @unique
+  avatarUrl           String?
+  isMasterCustomer    Boolean                @default(false)
+  stage               ContactStage           @default(NEW_LEAD)
+  lastAddress         String?
+  lastBillingAddress  String?
+  lastShippingAddress String?
+  shippingAddress     String?
+  bankDetails         String?
+  unreadCount         Int                    @default(0)
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  userId              String
+  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages            Message[]
+  notes               Note[]
+  quotations          Quotation[]
+  orders              Order[]
+  reminders           Reminder[]
+  broadcastRecipients BroadcastRecipient[]
+  tags                Tag[]                  @relation("ContactTags")
+  groups              Group[]                @relation("GroupContacts")
+
+  @@index([userId])
+}
+
+model Message {
+  id              String         @id @default(cuid())
+  from            MessageFrom
+  to              String
+  text            String?
+  mediaUrl        String?
+  fileName        String?
+  type            MessageType
+  status          MessageStatus
+  createdAt       DateTime       @default(now())
+  wamid           String?        @unique
+  contactId       String
+  contact         Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  productId       String?
+  product         Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  replyToId       String?
+  replyToText     String?
+  replyToMediaUrl String?
+  replyTo         Message?       @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies         Message[]      @relation("MessageReplies")
+  groupId         String?
+  group           Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([wamid])
+}
+
+model Product {
+  id            String          @id @default(cuid())
+  name          String
+  price         Float
+  description   String?
+  category      String?
+  inStock       Boolean         @default(true)
+  stockQuantity Int             @default(0)
+  workflow      WorkflowType    @default(HYBRID)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images        ProductImage[]
+  messages      Message[]
+  quotationItems QuotationItem[]
+  orderItems    OrderItem[]
+
+  @@index([userId])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Quotation {
+  id                  String          @id @default(cuid())
+  customerName        String
+  contactNumber       String
+  address             String? // Legacy
+  billingAddress      String?
+  shippingAddress     String?
+  subtotal            Float
+  total               Float
+  status              QuotationStatus @default(DRAFT)
+  discountPercentage  Float?
+  taxRate             Float?
+  deliveryCharges     Float?
+  notes               String?
+  paymentLinkId       String?
+  paymentLinkUrl      String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  contactId           String
+  contact             Contact         @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items               QuotationItem[]
+  payments            Payment[]
+  reminders           Reminder[]
+
+  @@index([contactId])
+  @@index([userId])
+}
+
+model QuotationItem {
+  id          String    @id @default(cuid())
+  quantity    Int
+  price       Float
+  productId   String?
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  quotationId String
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                  String             @id @default(cuid())
+  customerName        String
+  contactNumber       String
+  billingAddress      String?
+  shippingAddress     String?
+  subtotal            Float
+  total               Float
+  discountPercentage  Float?
+  deliveryCharges     Float?
+  notes               String?
+  status              OrderStatus        @default(PENDING)
+  paymentStatus       OrderPaymentStatus @default(UNPAID)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  contactId           String
+  contact             Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items               OrderItem[]
+  payments            Payment[]
+
+  @@index([contactId])
+  @@index([userId])
+}
+
+model OrderItem {
+  id          String          @id @default(cuid())
+  productName String
+  quantity    String // Can be "1kg", "250g", "2", etc.
+  price       Float
+  status      OrderItemStatus @default(PENDING)
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model Payment {
+  id                String    @id @default(cuid())
+  amount            Float
+  method            String
+  status            String    @default("PAID")
+  notes             String?
+  createdAt         DateTime  @default(now())
+  quotationId       String?
+  quotation         Quotation? @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  orderId           String?
+  order             Order?     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  razorpayPaymentId String?
+
+  @@index([quotationId])
+  @@index([orderId])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String
+  color    String
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts Contact[] @relation("ContactTags")
+
+  @@unique([userId, name])
+}
+
+model Reminder {
+  id              String         @id @default(cuid())
+  remindAt        DateTime
+  ownerMessage    String
+  customerMessage String?
+  status          ReminderStatus @default(PENDING)
+  createdAt       DateTime       @default(now())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contactId       String
+  contact         Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  quotationId     String?
+  quotation       Quotation?     @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@index([status, remindAt])
+}
+
+model Broadcast {
+  id         String                 @id @default(cuid())
+  message    String
+  templateId String
+  status     BroadcastStatus        @default(PENDING)
+  sentAt     DateTime               @default(now())
+  userId     String
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipients BroadcastRecipient[]
+}
+
+model BroadcastRecipient {
+  id          String                   @id @default(cuid())
+  status      BroadcastRecipientStatus @default(PENDING)
+  broadcastId String
+  broadcast   Broadcast                @relation(fields: [broadcastId], references: [id], onDelete: Cascade)
+  contactId   String
+  contact     Contact                  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id              String    @id @default(cuid())
+  name            String
+  whatsappGroupId String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        Message[]
+  contacts        Contact[] @relation("GroupContacts")
+
+  @@unique([userId, whatsappGroupId])
+}
