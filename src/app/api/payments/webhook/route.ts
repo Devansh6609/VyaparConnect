@@ -96,12 +96,20 @@ export async function POST(req: Request) {
           const confirmationText = `✅ Payment Received! We have received your payment of ₹${paymentAmount.toLocaleString(
             "en-IN"
           )} for Quotation #${quotation.id.substring(0, 6)}. Thank you!`;
+          const waResponse = await sendWhatsAppMessage(
+            quotation.contact.phone,
+            confirmationText,
+            creds
+          );
+          const wamid = waResponse?.messages?.[0]?.id;
           await saveAndEmitMessage({
             from: "business",
             to: quotation.contact.phone,
             type: "text",
             text: confirmationText,
             contactId: quotation.contact.id,
+            wamid,
+            status: wamid ? "sent" : "failed",
           });
         }
         getIO()?.emit("quotation_update", updatedQuotation);
@@ -148,12 +156,20 @@ export async function POST(req: Request) {
           const confirmationText = `✅ Payment Received! We have received your payment of ₹${paymentAmount.toLocaleString(
             "en-IN"
           )} for Order #${order.id.substring(0, 6)}. Thank you!`;
+          const waResponse = await sendWhatsAppMessage(
+            order.contact.phone,
+            confirmationText,
+            creds
+          );
+          const wamid = waResponse?.messages?.[0]?.id;
           await saveAndEmitMessage({
             from: "business",
             to: order.contact.phone,
             type: "text",
             text: confirmationText,
             contactId: order.contact.id,
+            wamid,
+            status: wamid ? "sent" : "failed",
           });
         }
         getIO()?.emit("order_update", updatedOrder);

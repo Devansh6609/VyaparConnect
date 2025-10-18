@@ -26,7 +26,7 @@ function getBillHtml(
   settings: Settings | null
 ): string {
   const subtotal = order.items.reduce(
-    (sum, item) => sum + item.price * Number(item.quantity),
+    (sum, item) => sum + item.price * Number(item.quantity || 1),
     0
   );
   const discountAmount = (subtotal * (order.discountPercentage || 0)) / 100;
@@ -37,7 +37,8 @@ function getBillHtml(
           <style>
             body { font-family: Arial, sans-serif; padding: 40px; width: 600px; background-color: #f9f9f9; color: #333; }
             .container { border: 1px solid #eee; background-color: white; padding: 30px; border-radius: 8px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+            .address-section { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 12px; color: #555; }
             .company-details { font-size: 12px; color: #555; }
             .bill-details { text-align: right; font-size: 12px; }
             .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
@@ -66,12 +67,23 @@ function getBillHtml(
               </div>
               <div class="bill-details">
                 <h2>INVOICE</h2>
-                <strong>Bill to:</strong> ${order.customerName}<br/>
                 <strong>Order ID:</strong> #${order.id.substring(0, 6)}<br/>
                 <strong>Date:</strong> ${new Date(
                   order.createdAt
                 ).toLocaleDateString()}
               </div>
+            </div>
+             <div class="address-section">
+                <div><strong>Billed To:</strong><br/>${
+                  order.customerName
+                }<br/>${
+    order.billingAddress?.replace(/\n/g, "<br/>") || ""
+  }</div>
+                <div><strong>Shipped To:</strong><br/>${
+                  order.customerName
+                }<br/>${
+    order.shippingAddress?.replace(/\n/g, "<br/>") || ""
+  }</div>
             </div>
             <table class="table">
               <thead><tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th></tr></thead>
@@ -131,7 +143,7 @@ export async function POST(
   try {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { contact: true, items: true },
+      include: { contact: true, items: true, payments: true },
     });
 
     if (!order || !order.contact) {
@@ -160,29 +172,37 @@ export async function POST(
     }
 
     // 1. Generate Bill Image
-    const html = getBillHtml(order, settings);
+    const html = getBillHtml(order as any, settings);
     const buffer = (await nodeHtmlToImage({
       html,
       puppeteerArgs: { args: ["--no-sandbox"] },
     })) as Buffer;
 
     const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-    if (!imgbbApiKey)
-      throw new Error("Server configuration error: ImgBB API key is not set.");
+    if (!imgbbApiKey) {
+      console.error("ImgBB API key is not configured.");
+      throw new Error("Server configuration error for file uploads.");
+    }
 
     const formData = new FormData();
     formData.append("image", buffer.toString("base64"));
+
     const imgbbRes = await fetch(
       `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
-      { method: "POST", body: formData }
+      {
+        method: "POST",
+        body: formData,
+      }
     );
-    // FIX: Corrected variable name from 'res' to 'imgbbRes' to parse the correct response object.
-    const imgbbData = await imgbbRes.json();
 
-    if (!imgbbRes.ok) throw new Error("Failed to upload bill image.");
+    const imgbbData = await imgbbRes.json();
+    if (!imgbbRes.ok || !imgbbData.data?.url) {
+      console.error("ImgBB upload failed for order bill:", imgbbData);
+      throw new Error("Failed to upload bill image.");
+    }
+    const publicImageUrl = imgbbData.data.url;
 
     // 2. Send via WhatsApp
-    const publicImageUrl = imgbbData.data.url;
     const caption = `Hi ${order.customerName}, thank you for your order! Please find the bill attached.`;
 
     const savedMessage = await prisma.message.create({

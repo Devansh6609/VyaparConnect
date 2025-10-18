@@ -9,7 +9,7 @@ import {
 } from "@/lib/whatsapp";
 import { getAuthSession } from "@/lib/auth";
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Contact } from "@/types";
+import type { Contact } from "../../../../types";
 
 async function getUserWhatsAppCredentials(
   userId: string
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 
     // Asynchronously send messages to all unique contacts
     (async () => {
-      for (const contact of uniqueContacts.values()) {
+      for (const contact of Array.from(uniqueContacts.values())) {
         try {
           const finalMessages = [];
 

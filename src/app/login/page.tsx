@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+// FIX: Add missing React import to resolve namespace error for React.FormEvent
+import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

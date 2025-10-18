@@ -1,4 +1,3 @@
-// src/app/chat/page.tsx
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -13,8 +12,10 @@ import ChatPageSkeleton from "@/components/skeletons/ChatPageSkeleton";
 
 function ChatPageContent() {
     const searchParams = useSearchParams();
-    const contactIdFromUrl = searchParams.get('contactId');
-    const messageFromUrl = searchParams.get('message');
+
+    // FIX: Use optional chaining and nullish coalescing to handle potentially null searchParams
+    const contactIdFromUrl = searchParams?.get('contactId') ?? null;
+    const messageFromUrl = searchParams?.get('message') ?? null;
 
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [activeContact, setActiveContact] = useState<Contact | null>(null);
@@ -171,7 +172,7 @@ function ChatPageContent() {
         setMessages(prev => [...prev, {
             id: `temp-${Date.now()}`, from: 'business', to: activeContact.phone, type: 'product',
             text: `Sharing ${product.name}...`, createdAt: new Date().toISOString(), contactId: activeContact.id, status: 'pending', product
-        }]);
+        } as Message]); // Cast to Message to satisfy type checker
         await fetch("/api/messages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

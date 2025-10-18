@@ -9,9 +9,10 @@ import {
 import Razorpay from "razorpay";
 import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
-// FIX: Replaced imports from @prisma/client as they cause build errors. Using local/app types instead.
-import type { Quotation } from "../../../../../types";
+import type { Quotation } from "../../../../../types"; // Keeping this for reference/compatibility
 import { getAuthSession } from "@/lib/auth";
+// --- NEW IMPORT: Use Prisma types for precise data structure ---
+import { Prisma } from "@prisma/client";
 
 // Re-defining Settings locally as it is not exported from @prisma/client in this environment.
 interface Settings {
@@ -28,7 +29,17 @@ interface Settings {
   whatsappPhoneNumberId?: string | null;
 }
 
-type QuotationWithDetails = Quotation;
+// 1. Define the selection structure used in the findUnique call (line 349)
+const quotationInclude = {
+  contact: true,
+  items: { include: { product: true } },
+  payments: true,
+} satisfies Prisma.QuotationInclude;
+
+// 2. Use Prisma.Type to get the exact type returned by the query
+type QuotationWithDetails = Prisma.QuotationGetPayload<{
+  include: typeof quotationInclude;
+}>;
 
 // --- HTML Template Helper ---
 function getBillHtml(
@@ -41,7 +52,8 @@ function getBillHtml(
           <style>
             body { font-family: Arial, sans-serif; padding: 40px; width: 600px; background-color: #f9f9f9; color: #333; }
             .container { border: 1px solid #eee; background-color: white; padding: 30px; border-radius: 8px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+            .address-section { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 12px; color: #555; }
             .company-details { font-size: 12px; color: #555; }
             .bill-details { text-align: right; font-size: 12px; }
             .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
@@ -82,6 +94,14 @@ function getBillHtml(
                   quotation.updatedAt
                 ).toLocaleDateString()}
               </div>
+            </div>
+             <div class="address-section">
+               <div><strong>Billing Address:</strong><br/>${
+                 quotation.billingAddress?.replace(/\n/g, "<br/>") || ""
+               }</div>
+               <div><strong>Shipping Address:</strong><br/>${
+                 quotation.shippingAddress?.replace(/\n/g, "<br/>") || ""
+               }</div>
             </div>
             <table class="table">
               <thead><tr><th>Product</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Amount</th></tr></thead>
@@ -397,11 +417,7 @@ export async function POST(
 
     const quotation = await prisma.quotation.findUnique({
       where: { id: quotationId },
-      include: {
-        contact: true,
-        items: { include: { product: true } },
-        payments: true,
-      },
+      include: quotationInclude, // Using the shared inclusion structure
     });
 
     if (!quotation || !quotation.contact) {

@@ -78,8 +78,8 @@ export interface Quotation {
   id: string;
   customerName: string;
   contactNumber: string;
-  billingAddress: string;
-  shippingAddress: string;
+  billingAddress: string | null;
+  shippingAddress: string | null;
   subtotal: number;
   total: number;
   status: QuotationStatus;
@@ -112,8 +112,8 @@ export interface Order {
   id: string;
   customerName: string;
   contactNumber: string;
-  billingAddress: string;
-  shippingAddress: string;
+  billingAddress: string | null;
+  shippingAddress: string | null;
   subtotal: number;
   total: number;
   discountPercentage?: number | null;

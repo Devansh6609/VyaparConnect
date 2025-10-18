@@ -28,6 +28,7 @@ export async function POST(req: Request) {
         body: JSON.stringify(payload),
       });
       const json = await r.json();
+      const wamid = json?.messages?.[0]?.id;
 
       // Save message to DB
       const contact =
@@ -48,6 +49,8 @@ export async function POST(req: Request) {
           mediaUrl: null,
           type: "text",
           contactId: contact.id,
+          wamid,
+          status: wamid ? "sent" : "failed",
         },
       });
 
@@ -91,6 +94,7 @@ export async function POST(req: Request) {
         body: JSON.stringify(payload),
       });
       const sendJson = await sendRes.json();
+      const wamid = sendJson?.messages?.[0]?.id;
 
       // Save to DB
       const contact =
@@ -111,6 +115,8 @@ export async function POST(req: Request) {
           mediaUrl: documentUrl,
           type: "document",
           contactId: contact.id,
+          wamid,
+          status: wamid ? "sent" : "failed",
         },
       });
 

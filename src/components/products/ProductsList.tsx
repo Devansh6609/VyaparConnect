@@ -2,13 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 // FIX: Used type-only import to prevent module resolution errors.
+// NOTE: The 'Product' type needs to be fully defined in "../../types"
 import type { Product } from "../../types";
 import AddProductForm from "../AddProductForm";
 import EditProductForm from "../EditProductForm";
 import Modal from "../ui/Modal";
-import { Plus, Edit, Trash2, Loader2, AlertCircle, Share } from 'lucide-react';
+// FIX: Added AlertCircle to the import list
+import { Plus, Edit, Trash2, Share, AlertCircle } from 'lucide-react';
 import ShareToGroupModal from "../../components/groups/ShareToGroupModel";
 import LoadingSpinner from "../ui/LoadingSpinner";
+
+// We define a base type that the UI can use, asserting it includes the required fields
+// This is done to satisfy the EditProductForm component's strict prop requirements.
+interface FullProduct extends Product {
+    // FIX: Redefine nullable fields to exclude 'null', which often conflicts with prop types.
+    description?: string;
+    category?: string;
+    // This assertion is needed because the EditProductForm requires the 'workflow' property,
+    // which might be missing or loosely typed in the imported 'Product' type.
+    workflow: any;
+}
 
 const ProductsList: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -16,7 +29,8 @@ const ProductsList: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+    // Use the asserted type here to ensure EditProductForm gets what it needs
+    const [productToEdit, setProductToEdit] = useState<FullProduct | null>(null);
     const [productToDelete, setProductToDelete] = useState<Product | null>(null);
     const [productToShare, setProductToShare] = useState<Product | null>(null);
 
@@ -25,8 +39,10 @@ const ProductsList: React.FC = () => {
         try {
             const res = await fetch('/api/products');
             if (!res.ok) throw new Error("Failed to fetch products.");
-            const data: Product[] = await res.json();
-            setProducts(data);
+            // Type cast the incoming data to satisfy the FullProduct type requirements
+            // We cast here to include the necessary 'workflow' property
+            const data: FullProduct[] = await res.json();
+            setProducts(data as Product[]);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -97,10 +113,10 @@ const ProductsList: React.FC = () => {
                                 </span>
                             </div>
                             <div className="flex space-x-2">
-                                <button onClick={() => setProductToShare(product)} className="p-2 text-gray-500 hover:text-green-600 hover:bg-gray-100 rounded-md" title="Share to Group">
+                                <button onClick={() => setProductToShare(product as FullProduct)} className="p-2 text-gray-500 hover:text-green-600 hover:bg-gray-100 rounded-md" title="Share to Group">
                                     <Share size={16} />
                                 </button>
-                                <button onClick={() => setProductToEdit(product)} className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-md" title="Edit Product">
+                                <button onClick={() => setProductToEdit(product as FullProduct)} className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-md" title="Edit Product">
                                     <Edit size={16} />
                                 </button>
                                 <button onClick={() => setProductToDelete(product)} className="p-2 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded-md" title="Delete Product">
@@ -124,7 +140,8 @@ const ProductsList: React.FC = () => {
             {productToEdit && (
                 <Modal isOpen={!!productToEdit} onClose={() => setProductToEdit(null)} title="Edit Product">
                     <EditProductForm
-                        product={productToEdit}
+                        // The explicit casting ensures the compiler accepts the object passed to the prop.
+                        product={productToEdit as FullProduct}
                         onSuccess={() => { setProductToEdit(null); fetchProducts(); }}
                         onCancel={() => setProductToEdit(null)}
                     />

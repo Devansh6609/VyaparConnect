@@ -24,6 +24,35 @@ async function getUserWhatsAppCredentials(
   return null;
 }
 
+// GET all payments for an order
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const orderId = params.id;
+    if (!orderId) {
+      return NextResponse.json(
+        { error: "Order ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const payments = await prisma.payment.findMany({
+      where: { orderId: orderId },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json(payments);
+  } catch (error) {
+    console.error("Failed to fetch payments:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch payments" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST to add a manual payment to an order
 export async function POST(
   req: Request,
   { params }: { params: { id: string } }
@@ -79,13 +108,21 @@ export async function POST(
       data: { paymentStatus: newStatus },
     });
 
+    // Send confirmation message, but don't fail the request if it errors out
     try {
       const creds = await getUserWhatsAppCredentials(order.contact.userId);
       if (creds) {
         const confirmationText = `✅ Payment Recorded. We have recorded your ${method} payment of ₹${floatAmount.toLocaleString(
           "en-IN"
         )}. Total Paid: ₹${totalPaid.toLocaleString("en-IN")}. Thank you!`;
-        await sendWhatsAppMessage(order.contact.phone, confirmationText, creds);
+
+        const waResponse = await sendWhatsAppMessage(
+          order.contact.phone,
+          confirmationText,
+          creds
+        );
+        const wamid = waResponse?.messages?.[0]?.id;
+
         getIO()?.emit(
           "newMessage",
           await prisma.message.create({
@@ -95,8 +132,14 @@ export async function POST(
               type: "text",
               text: confirmationText,
               contactId: order.contact.id,
+              wamid: wamid,
+              status: wamid ? "sent" : "failed",
             },
           })
+        );
+      } else {
+        console.warn(
+          `Could not send WhatsApp confirmation for order ${orderId} - no credentials found for user ${order.contact.userId}`
         );
       }
     } catch (messageError) {
@@ -106,7 +149,6 @@ export async function POST(
       );
     }
 
-    // Since socket events are not implemented for orders, we return the full updated object for client-side state update
     const updatedOrder = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -115,6 +157,7 @@ export async function POST(
         contact: true,
       },
     });
+    getIO()?.emit("order_update", updatedOrder);
 
     return NextResponse.json(updatedOrder, { status: 201 });
   } catch (error) {

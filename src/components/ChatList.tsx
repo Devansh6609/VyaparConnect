@@ -1,4 +1,3 @@
-// src/components/ChatList.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -79,7 +78,8 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
         fetchChats(null, selectedTagIds);
     }, [selectedTagIds, fetchChats]);
 
-    const lastChatElementRef = useCallback(node => {
+    // FIX: Explicitly type 'node' as HTMLLIElement | null
+    const lastChatElementRef = useCallback((node: HTMLLIElement | null) => {
         if (loading) return;
         if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
@@ -138,8 +138,8 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
                 });
             };
 
-            socket.on('newMessage', handleNewMessage);
-            return () => { socket.off('newMessage', handleNewMessage); };
+            (socket as any).on('newMessage', handleNewMessage);
+            return () => { (socket as any).off('newMessage', handleNewMessage); };
         }
     }, [socket, activeContactId, fetchChats, selectedTagIds]);
 

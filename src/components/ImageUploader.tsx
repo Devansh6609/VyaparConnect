@@ -17,14 +17,18 @@ export default function ImageUploader({
     const [isUploading, setIsUploading] = useState(false);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
+        if (!e.target.files || e.target.files.length === 0) return;
 
         setIsUploading(true);
 
         // Create a copy of current images to append to
         const currentImages = [...images];
+        const files = e.target.files;
 
-        for (const file of Array.from(e.target.files)) {
+        // FIX: Using classic indexed 'for' loop to bypass TypeScript's 'downlevelIteration' error.
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
             // 1. ImgBB requires FormData
             const formData = new FormData();
             formData.append("image", file); // ImgBB expects the key to be "image"

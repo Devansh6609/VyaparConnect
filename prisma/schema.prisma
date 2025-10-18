@@ -106,13 +106,13 @@ enum BroadcastRecipientStatus {
 // -------------------------------------
 
 model User {
-  id                      String    @id @default(cuid())
+  id                      String            @id @default(cuid())
   name                    String?
-  email                   String?   @unique
+  email                   String?           @unique
   emailVerified           DateTime?
   image                   String?
   password                String?
-  hasCompletedOnboarding  Boolean   @default(false)
+  hasCompletedOnboarding  Boolean           @default(false)
   accounts                Account[]
   sessions                Session[]
   settings                Settings?
@@ -127,18 +127,18 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id                      String @id @default(cuid())
+  userId                  String
+  type                    String
+  provider                String
+  providerAccountId       String
+  refresh_token           String? @db.Text
+  access_token            String? @db.Text
+  expires_at              Int?
+  token_type              String?
+  scope                   String?
+  id_token                String? @db.Text
+  session_state           String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -176,6 +176,8 @@ model Settings {
   razorpayKeySecret         String?
   primaryWorkflow           WorkflowType? @default(HYBRID)
   geminiApiKey              String?
+  // FIX FOR UPLOAD ROUTE ERROR
+  imgbbApiKey               String?       // <-- ADDED THIS FIELD
   whatsappPhoneNumberId     String?
   whatsappBusinessAccountId String?
   whatsappAccessToken       String?
@@ -183,36 +185,36 @@ model Settings {
 }
 
 model Contact {
-  id                  String                 @id @default(cuid())
-  name                String
-  phone               String                 @unique
-  avatarUrl           String?
-  isMasterCustomer    Boolean                @default(false)
-  stage               ContactStage           @default(NEW_LEAD)
-  lastAddress         String?
-  lastBillingAddress  String?
-  lastShippingAddress String?
-  shippingAddress     String?
-  bankDetails         String?
-  unreadCount         Int                    @default(0)
-  createdAt           DateTime               @default(now())
-  updatedAt           DateTime               @updatedAt
-  userId              String
-  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages            Message[]
-  notes               Note[]
-  quotations          Quotation[]
-  orders              Order[]
-  reminders           Reminder[]
-  broadcastRecipients BroadcastRecipient[]
-  tags                Tag[]                  @relation("ContactTags")
-  groups              Group[]                @relation("GroupContacts")
+  id                      String               @id @default(cuid())
+  name                    String
+  phone                   String               @unique
+  avatarUrl               String?
+  isMasterCustomer        Boolean              @default(false)
+  stage                   ContactStage         @default(NEW_LEAD)
+  lastAddress             String?
+  lastBillingAddress      String?
+  lastShippingAddress     String?
+  shippingAddress         String?
+  bankDetails             String?
+  unreadCount             Int                  @default(0)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  userId                  String
+  user                    User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages                Message[]
+  notes                   Note[]
+  quotations              Quotation[]
+  orders                  Order[]
+  reminders               Reminder[]
+  broadcastRecipients     BroadcastRecipient[]
+  tags                    Tag[]                @relation("ContactTags")
+  groups                  Group[]              @relation("GroupContacts")
 
   @@index([userId])
 }
 
 model Message {
-  id              String         @id @default(cuid())
+  id              String        @id @default(cuid())
   from            MessageFrom
   to              String
   text            String?
@@ -220,41 +222,41 @@ model Message {
   fileName        String?
   type            MessageType
   status          MessageStatus
-  createdAt       DateTime       @default(now())
-  wamid           String?        @unique
+  createdAt       DateTime      @default(now())
+  wamid           String?       @unique
   contactId       String
-  contact         Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contact         Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
   productId       String?
-  product         Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  product         Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   replyToId       String?
   replyToText     String?
   replyToMediaUrl String?
-  replyTo         Message?       @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  replies         Message[]      @relation("MessageReplies")
+  replyTo         Message?      @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies         Message[]     @relation("MessageReplies")
   groupId         String?
-  group           Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group           Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@index([contactId])
   @@index([wamid])
 }
 
 model Product {
-  id            String          @id @default(cuid())
-  name          String
-  price         Float
-  description   String?
-  category      String?
-  inStock       Boolean         @default(true)
-  stockQuantity Int             @default(0)
-  workflow      WorkflowType    @default(HYBRID)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  userId        String
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  images        ProductImage[]
-  messages      Message[]
-  quotationItems QuotationItem[]
-  orderItems    OrderItem[]
+  id              String          @id @default(cuid())
+  name            String
+  price           Float
+  description     String?
+  category        String?
+  inStock         Boolean         @default(true)
+  stockQuantity   Int             @default(0)
+  workflow        WorkflowType    @default(HYBRID)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images          ProductImage[]
+  messages        Message[]
+  quotationItems  QuotationItem[]
+  orderItems      OrderItem[]
 
   @@index([userId])
 }
@@ -267,30 +269,30 @@ model ProductImage {
 }
 
 model Quotation {
-  id                  String          @id @default(cuid())
-  customerName        String
-  contactNumber       String
-  address             String? // Legacy
-  billingAddress      String?
-  shippingAddress     String?
-  subtotal            Float
-  total               Float
-  status              QuotationStatus @default(DRAFT)
-  discountPercentage  Float?
-  taxRate             Float?
-  deliveryCharges     Float?
-  notes               String?
-  paymentLinkId       String?
-  paymentLinkUrl      String?
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @updatedAt
-  contactId           String
-  contact             Contact         @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  userId              String
-  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items               QuotationItem[]
-  payments            Payment[]
-  reminders           Reminder[]
+  id                 String            @id @default(cuid())
+  customerName       String
+  contactNumber      String
+  address            String? // Legacy
+  billingAddress     String?
+  shippingAddress    String?
+  subtotal           Float
+  total              Float
+  status             QuotationStatus   @default(DRAFT)
+  discountPercentage Float?
+  taxRate            Float?
+  deliveryCharges    Float?
+  notes              String?
+  paymentLinkId      String?
+  paymentLinkUrl     String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  contactId          String
+  contact            Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items              QuotationItem[]
+  payments           Payment[]
+  reminders          Reminder[]
 
   @@index([contactId])
   @@index([userId])
@@ -307,26 +309,26 @@ model QuotationItem {
 }
 
 model Order {
-  id                  String             @id @default(cuid())
-  customerName        String
-  contactNumber       String
-  billingAddress      String?
-  shippingAddress     String?
-  subtotal            Float
-  total               Float
-  discountPercentage  Float?
-  deliveryCharges     Float?
-  notes               String?
-  status              OrderStatus        @default(PENDING)
-  paymentStatus       OrderPaymentStatus @default(UNPAID)
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  contactId           String
-  contact             Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  userId              String
-  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items               OrderItem[]
-  payments            Payment[]
+  id                 String             @id @default(cuid())
+  customerName       String
+  contactNumber      String
+  billingAddress     String?
+  shippingAddress    String?
+  subtotal           Float
+  total              Float
+  discountPercentage Float?
+  deliveryCharges    Float?
+  notes              String?
+  status             OrderStatus        @default(PENDING)
+  paymentStatus      OrderPaymentStatus @default(UNPAID)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  contactId          String
+  contact            Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items              OrderItem[]
+  payments           Payment[]
 
   @@index([contactId])
   @@index([userId])
@@ -345,17 +347,17 @@ model OrderItem {
 }
 
 model Payment {
-  id                String    @id @default(cuid())
-  amount            Float
-  method            String
-  status            String    @default("PAID")
-  notes             String?
-  createdAt         DateTime  @default(now())
-  quotationId       String?
-  quotation         Quotation? @relation(fields: [quotationId], references: [id], onDelete: Cascade)
-  orderId           String?
-  order             Order?     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  razorpayPaymentId String?
+  id                  String     @id @default(cuid())
+  amount              Float
+  method              String
+  status              String     @default("PAID")
+  notes               String?
+  createdAt           DateTime   @default(now())
+  quotationId         String?
+  quotation           Quotation? @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  orderId             String?
+  order               Order?     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  razorpayPaymentId   String?
 
   @@index([quotationId])
   @@index([orderId])
@@ -370,13 +372,14 @@ model Note {
 }
 
 model Tag {
-  id       String    @id @default(cuid())
-  name     String
-  color    String
-  userId   String
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contacts Contact[] @relation("ContactTags")
+  id        String    @id @default(cuid())
+  name      String
+  color     String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts  Contact[] @relation("ContactTags")
 
+  // FIX: Added composite unique constraint (from previous fix)
   @@unique([userId, name])
 }
 
@@ -398,23 +401,23 @@ model Reminder {
 }
 
 model Broadcast {
-  id         String                 @id @default(cuid())
+  id         String               @id @default(cuid())
   message    String
   templateId String
-  status     BroadcastStatus        @default(PENDING)
-  sentAt     DateTime               @default(now())
+  status     BroadcastStatus      @default(PENDING)
+  sentAt     DateTime             @default(now())
   userId     String
-  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   recipients BroadcastRecipient[]
 }
 
 model BroadcastRecipient {
-  id          String                   @id @default(cuid())
+  id          String                 @id @default(cuid())
   status      BroadcastRecipientStatus @default(PENDING)
   broadcastId String
-  broadcast   Broadcast                @relation(fields: [broadcastId], references: [id], onDelete: Cascade)
+  broadcast   Broadcast              @relation(fields: [broadcastId], references: [id], onDelete: Cascade)
   contactId   String
-  contact     Contact                  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contact     Contact                @relation(fields: [contactId], references: [id], onDelete: Cascade)
 }
 
 model Group {

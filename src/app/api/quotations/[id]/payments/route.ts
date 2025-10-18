@@ -113,11 +113,12 @@ export async function POST(
           "en-IN"
         )}. Total Paid: ₹${totalPaid.toLocaleString("en-IN")}. Thank you!`;
 
-        await sendWhatsAppMessage(
+        const waResponse = await sendWhatsAppMessage(
           quotation.contact.phone,
           confirmationText,
           creds
         );
+        const wamid = waResponse?.messages?.[0]?.id;
 
         getIO()?.emit(
           "newMessage",
@@ -128,6 +129,8 @@ export async function POST(
               type: "text",
               text: confirmationText,
               contactId: quotation.contact.id,
+              wamid: wamid,
+              status: wamid ? "sent" : "failed",
             },
           })
         );

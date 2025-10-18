@@ -74,7 +74,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
               <strong>Billed To:</strong><br/>
               ${quotation.customerName}<br/>
               ${quotation.contactNumber}<br/>
-              ${quotation.address || "N/A"}
+              ${quotation.billingAddress?.replace(/\n/g, "<br/>") || "N/A"}
             </div>
             <div style="text-align: right;">
               <strong>Quotation ID:</strong> ${quotation.id}<br/>

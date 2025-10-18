@@ -13,7 +13,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -36,6 +36,8 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "vite.config.ts", // <--- EXCLUDE THE VITE CONFIG FILE
+    "tsconfig.server.json" // <--- EXCLUDE THE EXTRA SERVER CONFIG (IF IT EXISTS)
   ]
 }

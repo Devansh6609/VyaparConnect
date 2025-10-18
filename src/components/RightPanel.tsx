@@ -1,4 +1,3 @@
-// src/components/RightPanel.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -54,6 +53,15 @@ const menuItemVariants: Variants = {
     visible: { y: 0, opacity: 1, transition: { ease: 'easeOut', duration: 0.3 } },
 };
 
+// FIX: Define a temporary interface to satisfy the consuming component's requirements
+// Note: This forces nullable strings to string, which is necessary for EditProductForm compatibility.
+interface FullProduct extends Product {
+    description: string;
+    category: string;
+    workflow: any; // Use 'any' or the correct enum type if imported (e.g., WorkflowType)
+}
+
+
 const RightPanel: React.FC<RightPanelProps> = ({
     activeContact,
     messages,
@@ -88,7 +96,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         try {
             setProductError(null);
             const res = await fetch('/api/products');
-            if (!res.ok) throw new Error("Failed to fetch products");
+            if (!res.ok) throw new Error("Failed to fetch products.");
             const data = await res.json();
             const productData = data.map((p: Product) => ({ ...p, imageUrl: p.images?.[0]?.url || 'https://i.imgur.com/vJkrA4g.png' }));
             setProducts(productData);
@@ -140,7 +148,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
             if (query) {
                 const lowerCaseQuery = query.toLowerCase();
-                const suggestions = productCatalog.filter(p =>
+                // FIX: Explicitly type 'p' as 'Product' to resolve implicit 'any' error
+                const suggestions = productCatalog.filter((p: Product) =>
                     p.name.toLowerCase().includes(lowerCaseQuery) ||
                     p.description?.toLowerCase().includes(lowerCaseQuery) ||
                     p.category?.toLowerCase().includes(lowerCaseQuery)
@@ -309,7 +318,13 @@ const RightPanel: React.FC<RightPanelProps> = ({
                         <ProductsSidebar
                             products={products}
                             onShareProduct={onShareProduct}
-                            onEditProduct={(p) => setProductToEdit(p)}
+                            // FIX: Ensure description and category are non-null when setting state for EditProductForm
+                            onEditProduct={(p) => setProductToEdit({
+                                ...p,
+                                description: p.description ?? '', // Coalesce null to empty string
+                                category: p.category ?? '', // Coalesce null to empty string
+                                workflow: p.workflow, // Preserve workflow property
+                            } as FullProduct)}
                             onDeleteProduct={(p) => setProductToDelete(p)}
                         />
                     </div>
@@ -483,7 +498,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
             {productToEdit && (
                 <Modal isOpen={!!productToEdit} onClose={() => setProductToEdit(null)} title="Edit Product">
                     <EditProductForm
-                        product={productToEdit}
+                        product={productToEdit as FullProduct}
                         onSuccess={() => { setProductToEdit(null); fetchProducts(); }}
                         onCancel={() => setProductToEdit(null)}
                     />

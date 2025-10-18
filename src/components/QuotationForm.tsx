@@ -140,7 +140,7 @@ const QuotationForm: React.FC<QuotationFormProps> = ({ contact, onCancel, onQuot
         {formState.items.map((item, index) => (
           <div key={index} className="flex items-center gap-2 mb-2">
             <select
-              value={item.productId}
+              value={item.productId ?? ''} // FIX APPLIED HERE
               onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
               className="w-1/2 border rounded-md p-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
               required

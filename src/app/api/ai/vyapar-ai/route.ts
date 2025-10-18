@@ -279,19 +279,48 @@ export async function POST(req: Request) {
             error: `Customer '${customerName}' not found.`,
           };
         } else {
-          const tag = await prisma.tag.upsert({
-            where: { name_userId: { name: tagName, userId } },
-            update: {},
-            create: { name: tagName, color: randomColor(), userId },
+          // `upsert` was causing a build error, so we use findFirst + create to work around it.
+          // This handles finding an existing tag or creating a new one.
+          let tag = await prisma.tag.findFirst({
+            where: { name: tagName, userId: userId },
           });
-          await prisma.contact.update({
-            where: { id: contact.id },
-            data: { tags: { connect: { id: tag.id } } },
-          });
-          functionResponseContent = {
-            success: true,
-            message: `Tag '${tagName}' was added to ${customerName}.`,
-          };
+
+          if (!tag) {
+            try {
+              tag = await prisma.tag.create({
+                data: { name: tagName, color: randomColor(), userId },
+              });
+            } catch (e: any) {
+              // This catch block handles a race condition: if another request creates the same tag
+              // between our `findFirst` and `create` calls, the `create` will fail with a
+              // unique constraint violation (P2002). We then re-fetch the tag.
+              if (e.code === "P2002") {
+                tag = await prisma.tag.findFirst({
+                  where: { name: tagName, userId: userId },
+                });
+              } else {
+                // For any other error, we re-throw it.
+                throw e;
+              }
+            }
+          }
+
+          if (!tag) {
+            // If tag is still not found (very unlikely), we can't proceed.
+            functionResponseContent = {
+              success: false,
+              error: `Could not create or find tag '${tagName}'.`,
+            };
+          } else {
+            await prisma.contact.update({
+              where: { id: contact.id },
+              data: { tags: { connect: { id: tag.id } } },
+            });
+            functionResponseContent = {
+              success: true,
+              message: `Tag '${tagName}' was added to ${customerName}.`,
+            };
+          }
         }
       } else if (call.name === "getProductDetails") {
         const { productName } = call.args as { productName: string };

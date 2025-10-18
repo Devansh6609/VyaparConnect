@@ -54,7 +54,12 @@ export async function POST(req: Request) {
     });
 
     // The response text is a JSON string, parse it.
-    const jsonResponse = JSON.parse(response.text);
+    const responseText = response.text;
+    if (!responseText) {
+      // If the model returns no text, gracefully return an empty array.
+      return NextResponse.json({ replies: [] });
+    }
+    const jsonResponse = JSON.parse(responseText);
 
     return NextResponse.json(jsonResponse);
   } catch (error) {

@@ -1,19 +1,21 @@
 "use client";
 
 import React, { useState } from 'react';
-// FIX: Corrected relative path to import User type.
-import { User } from '@/types';
+// FIX: Changed import from non-existent 'User' to the correct 'Contact' type
+import { Contact } from '@/types';
 import { X } from 'lucide-react';
+import LoadingSpinner from './ui/LoadingSpinner'; // Assuming you need this for the button
 
 interface PromoteCustomerModalProps {
-    contact: User;
+    // FIX: Changed contact type from User to the correct Contact type
+    contact: Contact;
     onClose: () => void;
     onSuccess: (updates: { shippingAddress: string; bankDetails: string }) => void;
 }
 
 const PromoteCustomerModal: React.FC<PromoteCustomerModalProps> = ({ contact, onClose, onSuccess }) => {
-    const [address, setAddress] = useState('');
-    const [bankDetails, setBankDetails] = useState('');
+    const [address, setAddress] = useState(contact.shippingAddress || ''); // Use existing address as default
+    const [bankDetails, setBankDetails] = useState(contact.bankDetails || ''); // Use existing bank details as default
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -74,7 +76,8 @@ const PromoteCustomerModal: React.FC<PromoteCustomerModalProps> = ({ contact, on
                         <label className="block text-sm font-medium text-gray-700">Contact Number</label>
                         <input
                             type="text"
-                            value={contact.phoneNumber}
+                            // FIX: Changed 'contact.phoneNumber' to 'contact.phone' based on Prisma schema history
+                            value={contact.phone || ''}
                             readOnly
                             className="mt-1 w-full border rounded-md px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
                         />
@@ -118,7 +121,16 @@ const PromoteCustomerModal: React.FC<PromoteCustomerModalProps> = ({ contact, on
                             disabled={loading}
                             className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                         >
-                            {loading ? 'Saving...' : 'Save & Promote'}
+                            {/* FINAL FIX: Remove 'size' and 'className' props to resolve the IntrinsicAttributes error. 
+                                We rely on default styling or inline CSS if absolutely necessary. */}
+                            {loading ? (
+                                <span className="flex items-center justify-center">
+                                    <LoadingSpinner />
+                                    <span className="ml-2">Saving...</span>
+                                </span>
+                            ) : (
+                                'Save & Promote'
+                            )}
                         </button>
                     </div>
                 </form>

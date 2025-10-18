@@ -75,7 +75,7 @@ export async function POST(
                   <strong>Billed To:</strong><br/>
                   ${quotation.customerName}<br/>
                   ${quotation.contactNumber}<br/>
-                  ${quotation.address || ""}
+                  ${quotation.billingAddress?.replace(/\n/g, "<br/>") || ""}
                 </div>
                 <div style="text-align: right;">
                   <strong>Quotation ID:</strong> ${quotation.id.substring(

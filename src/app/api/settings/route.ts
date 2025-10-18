@@ -16,16 +16,23 @@ export async function GET() {
       where: { userId: session.user.id },
     });
 
-    const settingsToReturn = { ...settings };
+    if (!settings) {
+      return NextResponse.json({});
+    }
+
+    // Type assertion is used here to ensure we can safely access and modify keys
+    // which are guaranteed to be present on a non-null settings object.
+    const settingsToReturn: any = { ...settings };
+
     // Never send the actual keys to the client. Send placeholders.
-    if (settingsToReturn?.geminiApiKey) {
+    if (settingsToReturn.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
     }
-    if (settingsToReturn?.imgbbApiKey) {
+    if (settingsToReturn.imgbbApiKey) {
       settingsToReturn.imgbbApiKey = "••••••••••••••••••••••••";
     }
 
-    return NextResponse.json(settingsToReturn || {});
+    return NextResponse.json(settingsToReturn);
   } catch (error) {
     console.error("GET /api/settings error:", error);
     return NextResponse.json(
@@ -95,7 +102,9 @@ export async function POST(req: Request) {
       },
     });
 
-    const settingsToReturn = { ...updatedSettings };
+    // Use type assertion here too for consistency in sanitizing the response
+    const settingsToReturn: any = { ...updatedSettings };
+
     if (settingsToReturn.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
     }

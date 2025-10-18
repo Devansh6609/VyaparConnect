@@ -10,8 +10,11 @@ import {
 import Razorpay from "razorpay";
 import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
-import type { Order } from "../../../../../types";
+import type { Order } from "../../../../../types"; // Keeping this import, but redefining the working type
 import { getAuthSession } from "@/lib/auth";
+
+// IMPORT PRISMA'S UTILITY TYPES HERE
+import { Prisma } from "@prisma/client";
 
 interface Settings {
   companyName?: string | null;
@@ -27,7 +30,20 @@ interface Settings {
   whatsappPhoneNumberId?: string | null;
 }
 
-type OrderWithDetails = Order;
+// 1. Define the selection structure used in the findFirst call (line 359)
+const orderInclude = {
+  contact: true,
+  items: true,
+  payments: true,
+} satisfies Prisma.OrderInclude;
+
+// 2. Use Prisma.Type to get the exact type returned by the query
+type OrderWithDetails = Prisma.OrderGetPayload<{
+  include: typeof orderInclude;
+}>;
+
+// The previous definition was: type OrderWithDetails = Order;
+// This is now replaced with a precise type matching the actual database return.
 
 // --- HTML Template Helper ---
 function getBillHtml(
@@ -154,7 +170,7 @@ async function createAndSendMessage(messageData: any, sendFunction: Function) {
 
 async function handleAction(
   action: string,
-  order: OrderWithDetails,
+  order: OrderWithDetails, // Now uses the correct Prisma-generated type
   settings: Settings | null,
   creds: WhatsAppCredentials,
   amount?: number
@@ -352,9 +368,10 @@ export async function POST(
   try {
     const { action, amount } = await req.json();
 
+    // The include structure must match the type definition above
     const order = await prisma.order.findFirst({
       where: { id: orderId, userId: session.user.id },
-      include: { contact: true, items: true, payments: true },
+      include: orderInclude,
     });
 
     if (!order) {
