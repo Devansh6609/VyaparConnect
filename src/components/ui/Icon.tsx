@@ -17,6 +17,7 @@ import {
   File,
   FileText,
   Filter,
+  Image, // Added Image icon
   LayoutDashboard,
   LineChart,
   Lock,
@@ -54,6 +55,7 @@ const iconMap = {
   file: File,
   fileText: FileText,
   filter: Filter,
+  image: Image, // Added Image icon
   layoutDashboard: LayoutDashboard,
   lineChart: LineChart,
   lock: Lock,

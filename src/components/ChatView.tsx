@@ -376,7 +376,7 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
             return (
                 <motion.div
                     key={message.id}
-                    layout
+                    // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
                     initial={{ opacity: 0, y: 10, x: isBusiness ? 10 : -10 }}
                     animate={{ opacity: 1, y: 0, x: 0 }}
                     exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}

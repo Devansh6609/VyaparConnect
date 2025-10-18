@@ -1,19 +1,7 @@
 {
-  "/settings/page": "app/settings/page.js",
   "/page": "app/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/api/dashboard/route": "app/api/dashboard/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/signup/page": "app/signup/page.js",
-  "/login/page": "app/login/page.js",
-  "/api/user/onboarding/route": "app/api/user/onboarding/route.js",
-  "/api/transactions/route": "app/api/transactions/route.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js",
-  "/broadcasts/page": "app/broadcasts/page.js",
-  "/quotations/page": "app/quotations/page.js",
-  "/groups/page": "app/groups/page.js",
-  "/api/broadcasts/route": "app/api/broadcasts/route.js",
-  "/api/groups/route": "app/api/groups/route.js",
-  "/api/settings/route": "app/api/settings/route.js",
-  "/api/profile/route": "app/api/profile/route.js"
+  "/api/dashboard/route": "app/api/dashboard/route.js",
+  "/settings/page": "app/settings/page.js",
+  "/api/settings/route": "app/api/settings/route.js"
 }

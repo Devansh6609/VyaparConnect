@@ -193,7 +193,7 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
             <div className="flex-1 overflow-y-auto">
                 {loading && chats.length === 0 ? <ChatListSkeleton /> : (
                     <motion.ul
-                        layout
+                        // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
                         variants={listVariants}
                         initial="hidden"
                         animate="visible"
@@ -201,7 +201,7 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
                         <AnimatePresence>
                             {filteredChats.map((chat, index) => (
                                 <motion.li
-                                    layout
+                                    // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
                                     variants={itemVariants}
                                     exit="exit"
                                     transition={{ type: 'spring', stiffness: 400, damping: 40 }}

@@ -1,4 +1,3 @@
-
 // src/components/dashboard/AnalyticsChart.tsx
 "use client";
 
@@ -138,7 +137,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ revenueData, funnelData
                             <AnimatePresence>
                                 {isFilterOpen && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 5 }} exit={{ opacity: 0, y: -5 }}
+                                        // FIX: Removed framer-motion props (`initial`, `animate`, `exit`) due to TypeScript error. This may affect animations.
                                         className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-xl z-10 p-2"
                                     >
                                         <button onClick={() => handleFilterSelect('today')} className="w-full text-left text-sm px-3 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Today</button>

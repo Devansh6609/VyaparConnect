@@ -17,9 +17,12 @@ export async function GET() {
     });
 
     const settingsToReturn = { ...settings };
-    // Never send the actual key to the client. Send a placeholder.
+    // Never send the actual keys to the client. Send placeholders.
     if (settingsToReturn?.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
+    }
+    if (settingsToReturn?.imgbbApiKey) {
+      settingsToReturn.imgbbApiKey = "••••••••••••••••••••••••";
     }
 
     return NextResponse.json(settingsToReturn || {});
@@ -54,12 +57,10 @@ export async function POST(req: Request) {
       razorpayKeySecret,
       primaryWorkflow,
       geminiApiKey,
+      imgbbApiKey,
     } = body;
 
-    const currentSettings = await prisma.settings.findUnique({
-      where: { userId },
-    });
-    const updateData = {
+    const updateData: any = {
       companyName,
       companyAddress,
       companyLogoUrl,
@@ -72,13 +73,17 @@ export async function POST(req: Request) {
       primaryWorkflow,
     };
 
-    // Only update the API key if it's a new value.
-    // If the user submits the placeholder, we don't change the stored key.
+    // Only update API keys if a new, non-placeholder value is provided.
     if (geminiApiKey && !geminiApiKey.startsWith("•")) {
-      (updateData as any).geminiApiKey = encrypt(geminiApiKey);
+      updateData.geminiApiKey = encrypt(geminiApiKey);
     } else if (geminiApiKey === "") {
-      // Allow clearing the key by submitting an empty string
-      (updateData as any).geminiApiKey = null;
+      updateData.geminiApiKey = null;
+    }
+
+    if (imgbbApiKey && !imgbbApiKey.startsWith("•")) {
+      updateData.imgbbApiKey = encrypt(imgbbApiKey);
+    } else if (imgbbApiKey === "") {
+      updateData.imgbbApiKey = null;
     }
 
     const updatedSettings = await prisma.settings.upsert({
@@ -93,6 +98,9 @@ export async function POST(req: Request) {
     const settingsToReturn = { ...updatedSettings };
     if (settingsToReturn.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
+    }
+    if (settingsToReturn.imgbbApiKey) {
+      settingsToReturn.imgbbApiKey = "••••••••••••••••••••••••";
     }
 
     return NextResponse.json(settingsToReturn, { status: 200 });

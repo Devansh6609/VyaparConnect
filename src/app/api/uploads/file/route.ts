@@ -1,8 +1,15 @@
 // src/app/api/uploads/file/route.ts
 import { NextResponse } from "next/server";
-// FIX: The 'process' object is globally available in Node.js, so an explicit import is not needed and can cause build errors.
+import { getAuthSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { decrypt } from "@/lib/crypto";
 
 export async function POST(req: Request) {
+  const session = await getAuthSession();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -11,16 +18,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-    if (!imgbbApiKey) {
-      console.error(
-        "ImgBB API key is not configured in environment variables."
-      );
+    // Fetch user-specific ImgBB API key
+    const userSettings = await prisma.settings.findUnique({
+      where: { userId: session.user.id },
+      select: { imgbbApiKey: true },
+    });
+
+    if (!userSettings?.imgbbApiKey) {
       return NextResponse.json(
-        { error: "Server configuration error for file uploads" },
-        { status: 500 }
+        {
+          error:
+            "Image hosting is not configured. Please add your ImgBB API key in Settings.",
+        },
+        { status: 400 }
       );
     }
+
+    const imgbbApiKey = decrypt(userSettings.imgbbApiKey);
 
     const uploadFormData = new FormData();
     uploadFormData.append("image", file);

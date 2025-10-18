@@ -2,8 +2,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { getIO } from "@/lib/socket";
-
-const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+import { decrypt } from "@/lib/crypto";
 
 // Helper to get a temporary media URL from a WhatsApp media ID
 async function getWhatsAppMediaUrl(
@@ -34,10 +33,11 @@ async function getWhatsAppMediaUrl(
 async function downloadAndUploadMedia(
   mediaUrl: string,
   token: string,
+  imgbbApiKey: string,
   fileName: string = "image.jpg"
 ): Promise<string | null> {
-  if (!IMGBB_API_KEY) {
-    console.error("ImgBB API key is missing.");
+  if (!imgbbApiKey) {
+    console.error("User-specific ImgBB API key is missing.");
     return null;
   }
   try {
@@ -55,7 +55,7 @@ async function downloadAndUploadMedia(
     formData.append("image", file, fileName);
 
     const uploadResponse = await fetch(
-      `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+      `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
       {
         method: "POST",
         body: formData,
@@ -232,39 +232,44 @@ export async function POST(req: Request) {
       }
     }
 
+    // Handle media messages using user's ImgBB key
+    const handleMedia = async (media: {
+      id: string;
+      caption?: string;
+      filename?: string;
+    }) => {
+      if (media.id && settings.imgbbApiKey) {
+        const decryptedImgbbKey = decrypt(settings.imgbbApiKey);
+        const temporaryMediaUrl = await getWhatsAppMediaUrl(
+          media.id,
+          settings.whatsappAccessToken!
+        );
+        if (temporaryMediaUrl) {
+          messageData.mediaUrl = await downloadAndUploadMedia(
+            temporaryMediaUrl,
+            settings.whatsappAccessToken!,
+            decryptedImgbbKey,
+            media.filename
+          );
+        }
+      }
+      messageData.text = media.caption || "";
+      messageData.fileName = media.filename;
+    };
+
     switch (msg.type) {
       case "text":
         messageData.text = msg.text.body;
         break;
       case "image":
-        messageData.text = msg.image.caption || "";
-        if (msg.image?.id) {
-          const temporaryMediaUrl = await getWhatsAppMediaUrl(
-            msg.image.id,
-            settings.whatsappAccessToken
-          );
-          if (temporaryMediaUrl)
-            messageData.mediaUrl = await downloadAndUploadMedia(
-              temporaryMediaUrl,
-              settings.whatsappAccessToken
-            );
-        }
+        await handleMedia({ id: msg.image?.id, caption: msg.image?.caption });
         break;
       case "document":
-        messageData.text = msg.document.caption || "";
-        messageData.fileName = msg.document.filename || "document";
-        if (msg.document?.id) {
-          const temporaryMediaUrl = await getWhatsAppMediaUrl(
-            msg.document.id,
-            settings.whatsappAccessToken
-          );
-          if (temporaryMediaUrl)
-            messageData.mediaUrl = await downloadAndUploadMedia(
-              temporaryMediaUrl,
-              settings.whatsappAccessToken,
-              messageData.fileName
-            );
-        }
+        await handleMedia({
+          id: msg.document?.id,
+          caption: msg.document?.caption,
+          filename: msg.document?.filename || "document",
+        });
         break;
       default:
         messageData.type = "unsupported";
