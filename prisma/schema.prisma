@@ -177,7 +177,7 @@ model Settings {
   primaryWorkflow           WorkflowType? @default(HYBRID)
   geminiApiKey              String?
   // FIX FOR UPLOAD ROUTE ERROR
-  imgbbApiKey               String?       // <-- ADDED THIS FIELD
+  imgbbApiKey               String?
   whatsappPhoneNumberId     String?
   whatsappBusinessAccountId String?
   whatsappAccessToken       String?
