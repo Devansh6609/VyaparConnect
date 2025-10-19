@@ -4,7 +4,7 @@
   "description": "Dedicated persistent server for Socket.IO real-time features.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "npm install && node index.js"
   },
   "dependencies": {
     "socket.io": "^4.7.5"
