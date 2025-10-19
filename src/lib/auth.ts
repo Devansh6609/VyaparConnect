@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth/next";
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import { getServerSession } from "next-auth/next"
+import { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import prisma from "@/lib/prisma"
+import bcrypt from "bcrypt"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -63,36 +63,50 @@ export const authOptions: NextAuthOptions = {
       // If user object exists, it's the initial sign-in.
       if (user) {
         token.id = user.id;
-      } // If token.id is not available, something is wrong, return the token.
+      }
 
+      // If token.id is not available, something is wrong, return the token.
       if (!token.id) {
         return token;
-      } // On every session access, re-fetch the user data from the DB. // This ensures the session is always fresh, which is crucial for // flows like onboarding where user data changes.
+      }
 
+      // On every session access, re-fetch the user data from the DB.
+      // This ensures the session is always fresh, which is crucial for
+      // flows like onboarding where user data changes.
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        include: { settings: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          hasCompletedOnboarding: true,
+          settings: {
+            select: {
+              primaryWorkflow: true,
+            },
+          },
+        },
       });
 
       if (!dbUser) {
-        // User not found in DB, invalidate the session by setting token.id to a value that allows it to be removed.
-        // We use 'any' here as the token.id is strictly typed as string, but we need to set it to undefined to invalidate.
-        (token.id as any) = undefined;
+        // User not found in DB, invalidate the session by returning a modified token
+        token.id = undefined;
         return token;
-      } // Update the token with the latest data from the database
+      }
 
+      // Update the token with the latest data from the database
       return {
         ...token, // preserve original token properties like iat, exp
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
         hasCompletedOnboarding: dbUser.hasCompletedOnboarding,
-        primaryWorkflow: dbUser.settings?.primaryWorkflow || "HYBRID",
+        primaryWorkflow: dbUser.settings?.primaryWorkflow || 'HYBRID',
       };
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
 };
 
