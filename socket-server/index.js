@@ -3,20 +3,22 @@ const { Server } = require("socket.io");
 // Render automatically sets the PORT environment variable
 const PORT = process.env.PORT || 4000;
 
-// Determine the allowed origin for CORS
-// We prioritize the Vercel environment variable for production safety, 
-// otherwise default to a broad wildcard for development/local testing flexibility.
-const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_VERCEL_URL 
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` // Use Vercel's domain for strict production CORS
-  : "*"; // Fallback for local testing or if environment var isn't set
+// Determine the allowed origin(s) for CORS.
+// We use a dedicated variable, CORS_ORIGIN, which can be a comma-separated list of URLs,
+// or '*' for full flexibility (local development).
+const ALLOWED_ORIGIN_ENV = process.env.CORS_ORIGIN || "*"; 
+
+// Convert comma-separated string into an array of origins, unless it's the wildcard '*'
+const ALLOWED_ORIGINS = ALLOWED_ORIGIN_ENV === "*" 
+    ? "*" 
+    : ALLOWED_ORIGIN_ENV.split(',').map(s => s.trim());
 
 // Create the Socket.IO server instance
 const io = new Server({
   serveClient: false, 
   cors: {
-    // FINAL FIX: We explicitly set the origin based on environment to ensure security 
-    // without running into platform-specific blocking issues.
-    origin: ALLOWED_ORIGIN, 
+    // FIX: Set the origin to the calculated array or wildcard
+    origin: ALLOWED_ORIGINS, 
     methods: ["GET", "POST"],
   },
 });
@@ -25,7 +27,7 @@ const io = new Server({
 io.listen(PORT);
 
 console.log(`🔌 Socket.IO Server listening on port ${PORT}`);
-console.log(`CORS Origin allowed: ${ALLOWED_ORIGIN}`);
+console.log(`CORS Origins allowed: ${JSON.stringify(ALLOWED_ORIGINS)}`);
 
 // --- Connection and Event Handlers ---
 
