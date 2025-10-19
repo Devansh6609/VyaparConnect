@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth/next";
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import { getServerSession } from "next-auth/next"
+import { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import prisma from "@/lib/prisma"
+import bcrypt from "bcrypt"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -101,12 +101,12 @@ export const authOptions: NextAuthOptions = {
         name: dbUser.name,
         email: dbUser.email,
         hasCompletedOnboarding: dbUser.hasCompletedOnboarding,
-        primaryWorkflow: dbUser.settings?.primaryWorkflow || "HYBRID",
+        primaryWorkflow: dbUser.settings?.primaryWorkflow || 'HYBRID',
       };
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
 };
 
