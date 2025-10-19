@@ -1,8 +1,39 @@
 // src/app/api/webhooks/whatsapp/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
 import { decrypt } from "@/lib/crypto";
+// IMPORTANT: Import io client to send events to the external Render server
+import { io } from "socket.io-client";
+
+// --- Socket Communication Helper ---
+// Replaces the old, broken getIO()?.emit(...) on Vercel
+async function emitEventToRender(event: string, data: any) {
+  const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+  if (!SOCKET_SERVER_URL) {
+    console.warn("SOCKET_SERVER_URL is not set. Cannot emit real-time event.");
+    return;
+  }
+
+  // Use the Socket.IO client library to connect to the external Render service
+  try {
+    const socket = io(SOCKET_SERVER_URL, {
+      // Note: Keep this short-lived and non-reconnecting for API events
+      reconnection: false,
+      timeout: 5000, // Timeout after 5 seconds
+    });
+
+    socket.on("connect", () => {
+      socket.emit(event, data);
+      socket.close(); // Close immediately after emitting
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error(`Socket connection error to Render: ${err.message}`);
+    });
+  } catch (error) {
+    console.error("Error creating socket client for event emission:", error);
+  }
+}
 
 // Helper to get a temporary media URL from a WhatsApp media ID
 async function getWhatsAppMediaUrl(
@@ -134,11 +165,8 @@ export async function POST(req: Request) {
         success: true,
         message: "ignored (unregistered phone id)",
       });
-    }
+    } // const io = getIO(); // OLD BROKEN LOGIC REMOVED // --- Message Status Update Logic ---
 
-    const io = getIO();
-
-    // --- Message Status Update Logic ---
     if (value.statuses) {
       const statusUpdate = value.statuses[0];
       const wamid = statusUpdate.id;
@@ -155,14 +183,17 @@ export async function POST(req: Request) {
         });
 
         if (updatedMessage.count > 0) {
-          io?.emit("message-status-update", { wamid, status: appStatus });
+          // NEW LOGIC: Emit status update to the external Render server
+          emitEventToRender("message-status-update", {
+            wamid,
+            status: appStatus,
+          });
           console.log(`✅ Message ${wamid} status updated to ${appStatus}`);
         }
       }
       return NextResponse.json({ success: true });
-    }
+    } // --- New Incoming Message Logic ---
 
-    // --- New Incoming Message Logic ---
     if (!value.messages || !settings.whatsappAccessToken) {
       return NextResponse.json({ status: "not a message or token missing" });
     }
@@ -193,8 +224,8 @@ export async function POST(req: Request) {
             userId: settings.userId,
             stage: "NEW_LEAD",
           },
-        });
-        io?.emit("new_lead", contact);
+        }); // NEW LOGIC: Emit new lead event to the external Render server
+        emitEventToRender("new_lead", contact);
       }
       messageData.contactId = contact.id;
       await prisma.contact.update({
@@ -230,9 +261,8 @@ export async function POST(req: Request) {
           messageData.replyToMediaUrl = originalMessage.product.images[0].url;
         }
       }
-    }
+    } // Handle media messages using user's ImgBB key
 
-    // Handle media messages using user's ImgBB key
     const handleMedia = async (media: {
       id: string;
       caption?: string;
@@ -279,9 +309,12 @@ export async function POST(req: Request) {
     const savedMessage = await prisma.message.create({
       data: messageData,
       include: { contact: true },
-    });
+    }); // NEW LOGIC: Emit new message event to the external Render server
 
-    io?.emit(isGroupMessage ? "newGroupMessage" : "newMessage", savedMessage);
+    emitEventToRender(
+      isGroupMessage ? "newGroupMessage" : "newMessage",
+      savedMessage
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
