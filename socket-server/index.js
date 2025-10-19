@@ -3,13 +3,20 @@ const { Server } = require("socket.io");
 // Render automatically sets the PORT environment variable
 const PORT = process.env.PORT || 4000;
 
+// Determine the allowed origin for CORS
+// We prioritize the Vercel environment variable for production safety, 
+// otherwise default to a broad wildcard for development/local testing flexibility.
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_VERCEL_URL 
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` // Use Vercel's domain for strict production CORS
+  : "*"; // Fallback for local testing or if environment var isn't set
+
 // Create the Socket.IO server instance
 const io = new Server({
-  // Use the port provided by the host (Render)
-  serveClient: false, // Optimizes by not serving the client library
+  serveClient: false, 
   cors: {
-    // Allows connections from any domain (Vercel deployment, local dev, etc.)
-    origin: "*", 
+    // FINAL FIX: We explicitly set the origin based on environment to ensure security 
+    // without running into platform-specific blocking issues.
+    origin: ALLOWED_ORIGIN, 
     methods: ["GET", "POST"],
   },
 });
@@ -18,6 +25,7 @@ const io = new Server({
 io.listen(PORT);
 
 console.log(`🔌 Socket.IO Server listening on port ${PORT}`);
+console.log(`CORS Origin allowed: ${ALLOWED_ORIGIN}`);
 
 // --- Connection and Event Handlers ---
 
@@ -35,10 +43,5 @@ io.on("connection", (socket) => {
   });
 });
 
-// This is where you would access the instance from your Next.js API routes 
-// if you were running on the same server. Since we are using an external service,
-// the Vercel API routes will use a different method (HTTP Post or client library)
-// to send events back to this server.
-
-// Export the IO instance for external use if needed (e.g., in a local test script)
+// Export the IO instance for external access (like the Vercel API routes need)
 module.exports = { io };
