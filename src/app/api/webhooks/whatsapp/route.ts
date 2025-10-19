@@ -1,69 +1,8 @@
 // src/app/api/webhooks/whatsapp/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
+import { emitSocketEvent } from "@/lib/socket";
 import { decrypt } from "@/lib/crypto";
-// IMPORTANT: Import io client to send events to the external Render server
-import { io } from "socket.io-client";
-
-// --- Socket Communication Helper ---
-// Replaces the old, broken getIO()?.emit(...) on Vercel
-// Improved reliability for short-lived connections in serverless environment
-async function emitEventToRender(event: string, data: any) {
-  const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
-  if (!SOCKET_SERVER_URL) {
-    console.warn("SOCKET_SERVER_URL is not set. Cannot emit real-time event.");
-    return;
-  }
-
-  // Use the Socket.IO client library to connect to the external Render service
-  try {
-    const socket = io(SOCKET_SERVER_URL, {
-      // Keep this short-lived and non-reconnecting for API events
-      reconnection: false,
-      timeout: 5000, // Timeout after 5 seconds
-    });
-
-    // Listener to ensure the event is sent and the socket is closed
-    const onConnect = () => {
-      console.log(`[Socket Client] Connected. Emitting ${event}.`);
-      socket.emit(event, data);
-      // Wait a small moment for the emission to fully process before closing
-      setTimeout(() => {
-        socket.close();
-      }, 100);
-    };
-
-    // Listener for connection errors
-    const onConnectError = (err: Error) => {
-      console.error(
-        `[Socket Client] Connection error to Render: ${err.message}`
-      );
-      socket.close();
-    };
-
-    // Listener for generic socket errors
-    const onError = (err: Error) => {
-      console.error(`[Socket Client] General socket error: ${err.message}`);
-      socket.close();
-    };
-
-    socket.on("connect", onConnect);
-    socket.on("connect_error", onConnectError);
-    socket.on("error", onError);
-
-    // Fallback timer to clean up resources if connection listeners fail to fire
-    setTimeout(() => {
-      if (!socket.connected) {
-        console.warn(
-          "[Socket Client] Timed out before connection or error, forcing close."
-        );
-        socket.close();
-      }
-    }, 5500);
-  } catch (error) {
-    console.error("Error creating socket client for event emission:", error);
-  }
-}
 
 // Helper to get a temporary media URL from a WhatsApp media ID
 async function getWhatsAppMediaUrl(
@@ -113,8 +52,6 @@ async function downloadAndUploadMedia(
     const file = new Blob([fileBuffer]);
 
     const formData = new FormData();
-    // Vercel environment may need a specific file type for FormData append
-    // Using 'file' as blob name is generally safer than 'file' as third arg (filename)
     formData.append("image", file, fileName);
 
     const uploadResponse = await fetch(
@@ -197,8 +134,9 @@ export async function POST(req: Request) {
         success: true,
         message: "ignored (unregistered phone id)",
       });
-    } // const io = getIO(); // OLD BROKEN LOGIC REMOVED // --- Message Status Update Logic ---
+    }
 
+    // --- Message Status Update Logic ---
     if (value.statuses) {
       const statusUpdate = value.statuses[0];
       const wamid = statusUpdate.id;
@@ -215,9 +153,7 @@ export async function POST(req: Request) {
         });
 
         if (updatedMessage.count > 0) {
-          // NEW LOGIC: Emit status update to the external Render server
-          // Note: We do not await this, as the webhook must return quickly.
-          emitEventToRender("message-status-update", {
+          await emitSocketEvent("message-status-update", {
             wamid,
             status: appStatus,
           });
@@ -225,8 +161,9 @@ export async function POST(req: Request) {
         }
       }
       return NextResponse.json({ success: true });
-    } // --- New Incoming Message Logic ---
+    }
 
+    // --- New Incoming Message Logic ---
     if (!value.messages || !settings.whatsappAccessToken) {
       return NextResponse.json({ status: "not a message or token missing" });
     }
@@ -257,8 +194,8 @@ export async function POST(req: Request) {
             userId: settings.userId,
             stage: "NEW_LEAD",
           },
-        }); // NEW LOGIC: Emit new lead event to the external Render server
-        emitEventToRender("new_lead", contact);
+        });
+        await emitSocketEvent("new_lead", contact);
       }
       messageData.contactId = contact.id;
       await prisma.contact.update({
@@ -294,8 +231,9 @@ export async function POST(req: Request) {
           messageData.replyToMediaUrl = originalMessage.product.images[0].url;
         }
       }
-    } // Handle media messages using user's ImgBB key
+    }
 
+    // Handle media messages using user's ImgBB key
     const handleMedia = async (media: {
       id: string;
       caption?: string;
@@ -342,9 +280,9 @@ export async function POST(req: Request) {
     const savedMessage = await prisma.message.create({
       data: messageData,
       include: { contact: true },
-    }); // NEW LOGIC: Emit new message event to the external Render server
+    });
 
-    emitEventToRender(
+    await emitSocketEvent(
       isGroupMessage ? "newGroupMessage" : "newMessage",
       savedMessage
     );

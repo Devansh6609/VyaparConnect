@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 
 async function saveAndEmitMessage(messageData: any) {
   const savedMessage = await prisma.message.create({
     data: messageData,
     include: { contact: true },
   });
-  getIO()?.emit("newMessage", savedMessage);
+  await emitSocketEvent("newMessage", savedMessage);
   return savedMessage;
 }
 
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
             status: wamid ? "sent" : "failed",
           });
         }
-        getIO()?.emit("quotation_update", updatedQuotation);
+        await emitSocketEvent("quotation_update", updatedQuotation);
       }
 
       // --- Handle Order Payment ---
@@ -172,7 +172,7 @@ export async function POST(req: Request) {
             status: wamid ? "sent" : "failed",
           });
         }
-        getIO()?.emit("order_update", updatedOrder);
+        await emitSocketEvent("order_update", updatedOrder);
       }
     }
 

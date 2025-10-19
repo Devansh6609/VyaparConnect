@@ -1,49 +1,64 @@
+const { createServer } = require("http");
+const express = require("express");
 const { Server } = require("socket.io");
 
-// Render automatically sets the PORT environment variable
 const PORT = process.env.PORT || 4000;
+const ALLOWED_ORIGIN_ENV = process.env.CORS_ORIGIN || "*";
+const EMITTER_SECRET = process.env.SOCKET_EMITTER_SECRET;
 
-// Determine the allowed origin(s) for CORS.
-// We use a dedicated variable, CORS_ORIGIN, which can be a comma-separated list of URLs,
-// or '*' for full flexibility (local development).
-const ALLOWED_ORIGIN_ENV = process.env.CORS_ORIGIN || "*"; 
+if (!EMITTER_SECRET) {
+    console.error("FATAL: SOCKET_EMITTER_SECRET is not set. The server will not be able to receive events from the backend.");
+    process.exit(1);
+}
 
-// Convert comma-separated string into an array of origins, unless it's the wildcard '*'
+const app = express();
+app.use(express.json());
+const httpServer = createServer(app);
+
 const ALLOWED_ORIGINS = ALLOWED_ORIGIN_ENV === "*" 
     ? "*" 
     : ALLOWED_ORIGIN_ENV.split(',').map(s => s.trim());
 
-// Create the Socket.IO server instance
-const io = new Server({
-  serveClient: false, 
-  cors: {
-    // FIX: Set the origin to the calculated array or wildcard
-    origin: ALLOWED_ORIGINS, 
-    methods: ["GET", "POST"],
-  },
+const io = new Server(httpServer, {
+    cors: {
+        origin: ALLOWED_ORIGINS,
+        methods: ["GET", "POST"],
+    },
 });
 
-// Start listening on the assigned port
-io.listen(PORT);
+// Health check endpoint
+app.get("/", (req, res) => {
+    res.send("Socket server is running.");
+});
 
-console.log(`🔌 Socket.IO Server listening on port ${PORT}`);
-console.log(`CORS Origins allowed: ${JSON.stringify(ALLOWED_ORIGINS)}`);
+// Secure endpoint for Vercel functions to emit events
+app.post("/emit", (req, res) => {
+    const secret = req.headers["x-emitter-secret"];
+    if (secret !== EMITTER_SECRET) {
+        console.warn("Received /emit request with invalid secret.");
+        return res.status(401).send("Unauthorized");
+    }
 
-// --- Connection and Event Handlers ---
+    const { event, data } = req.body;
+    if (!event || !data) {
+        return res.status(400).send("Bad Request: Missing event or data.");
+    }
+
+    // Emit the event to all connected clients
+    io.emit(event, data);
+    
+    res.status(200).send("Event emitted.");
+});
 
 io.on("connection", (socket) => {
-  console.log("✅ New client connected:", socket.id);
+    console.log("✅ New client connected:", socket.id);
 
-  // Event handler for joining a specific chat room (e.g., a contact's ID)
-  socket.on("join", (room) => {
-    socket.join(room);
-    console.log(`Client ${socket.id} joined room: ${room}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
-  });
+    socket.on("disconnect", () => {
+        console.log("❌ Client disconnected:", socket.id);
+    });
 });
 
-// Export the IO instance for external access (like the Vercel API routes need)
-module.exports = { io };
+httpServer.listen(PORT, () => {
+    console.log(`🚀 Socket & Express server listening on port ${PORT}`);
+    console.log(`CORS Origins allowed: ${JSON.stringify(ALLOWED_ORIGINS)}`);
+});

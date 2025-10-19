@@ -7,8 +7,8 @@ import {
   sendWhatsAppDocumentMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
-import { getAuthSession } from "../../../lib/auth";
+import { emitSocketEvent } from "@/lib/socket";
+import { getAuthSession } from "@/lib/auth";
 
 async function getUserWhatsAppCredentials(
   userId: string
@@ -182,7 +182,7 @@ export async function POST(req: Request) {
               where: { id: imageMessage.id },
               data: { wamid, status: newStatus },
             });
-            getIO()?.emit("message-status-update", {
+            await emitSocketEvent("message-status-update", {
               id: updatedMsg.id,
               status: newStatus,
               wamid,
@@ -200,7 +200,7 @@ export async function POST(req: Request) {
             where: { id: savedTextMsg.id },
             data: { wamid, status: newStatus },
           });
-          getIO()?.emit("message-status-update", {
+          await emitSocketEvent("message-status-update", {
             id: updatedMsg.id,
             status: newStatus,
             wamid,
@@ -216,7 +216,7 @@ export async function POST(req: Request) {
               where: { id: msg.id },
               data: { status: "failed" },
             });
-            getIO()?.emit("message-status-update", {
+            await emitSocketEvent("message-status-update", {
               id: msg.id,
               status: "failed",
             });
@@ -273,7 +273,7 @@ export async function POST(req: Request) {
       data: messageData,
       include: { product: { include: { images: true } }, contact: true },
     });
-    getIO()?.emit("newMessage", savedMessage);
+    await emitSocketEvent("newMessage", savedMessage);
 
     let waResponse;
 
@@ -310,7 +310,7 @@ export async function POST(req: Request) {
       data: { wamid, status: newStatus },
       include: { contact: true, product: { include: { images: true } } },
     });
-    getIO()?.emit("message-status-update", {
+    await emitSocketEvent("message-status-update", {
       id: finalMessage.id,
       status: finalMessage.status,
       wamid: finalMessage.wamid,

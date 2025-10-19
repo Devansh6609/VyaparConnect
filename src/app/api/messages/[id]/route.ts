@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 // FIX: Use the Prisma singleton instance to ensure a single connection pool and fix import errors.
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 
 export async function DELETE(
   _: Request,
@@ -20,7 +20,7 @@ export async function DELETE(
     });
 
     // Emit event to clients to remove the message from the UI
-    getIO()?.emit("deleteMessage", { messageId: params.id });
+    await emitSocketEvent("deleteMessage", { messageId: params.id });
 
     return NextResponse.json({ success: true });
   } catch (err) {

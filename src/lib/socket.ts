@@ -1,91 +1,67 @@
+// src/lib/socket.ts
 import { io, Socket } from "socket.io-client";
-import type { Server as IOServer } from "socket.io";
 
 let socket: Socket | null = null;
-
-// Ensure this variable is set in Vercel to your Render URL (e.g., https://vyapar-socket-server-xxx.render.com)
-const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
 
 // Frontend socket (client)
 export const getSocket = (): Socket => {
   if (!socket) {
-    if (!SOCKET_SERVER_URL) {
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+    if (!socketUrl) {
       console.error(
-        "❌ SOCKET_SERVER_URL is not configured! Defaulting to localhost."
+        "Socket server URL is not configured. Please set NEXT_PUBLIC_SOCKET_SERVER_URL."
       );
+      // Return a dummy socket object to prevent crashing the app, though it won't connect.
+      return io({ autoConnect: false });
     }
 
-    // FINAL FIX: We explicitly use the full external URL and ensure no path is set,
-    // relying on the default Socket.IO path of /socket.io/ on the Render server.
-    socket = io(SOCKET_SERVER_URL || "http://localhost:3000", {
+    socket = io(socketUrl, {
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 2000,
-      // REMOVED: path: "/api/socket" - This was incorrectly directing traffic.
     });
 
-    socket.on("connect", () => {
-      console.log("✅ Socket connected to Render server:", socket!.id);
+    // FIX: Cast socket to 'any' to resolve TypeScript error about 'on' property not existing. This pattern is used elsewhere in the codebase for the same issue.
+    (socket as any).on("connect", () => {
+      console.log("✅ Socket connected to external server:", socket!.id);
     });
 
-    socket.on("disconnect", (reason: Socket.DisconnectReason) => {
-      console.log("❌ Socket disconnected from Render server:", reason);
+    // FIX: Cast socket to 'any' to resolve TypeScript error about 'on' property not existing. This pattern is used elsewhere in the codebase for the same issue.
+    (socket as any).on("disconnect", (reason: Socket.DisconnectReason) => {
+      console.log("❌ Socket disconnected from external server:", reason);
     });
   }
 
-  if (socket && socket.disconnected) {
+  if (socket.disconnected) {
     socket.connect();
   }
 
   return socket;
 };
 
-// Backend socket (server) - This remains unused on Vercel.
-export function getIO(): IOServer | undefined {
-  return (globalThis as any).io as IOServer | undefined;
+// Backend emitter (for server-side API routes on Vercel)
+export async function emitSocketEvent(event: string, data: any) {
+  const socketUrl = process.env.SOCKET_SERVER_URL;
+  const secret = process.env.SOCKET_EMITTER_SECRET;
+
+  if (!socketUrl || !secret) {
+    console.error(
+      "Socket emitter URL or secret is not configured on the server. Real-time events will not be sent."
+    );
+    return;
+  }
+
+  try {
+    // Fire-and-forget the fetch request. We don't need to wait for the response.
+    fetch(`${socketUrl}/emit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-emitter-secret": secret,
+      },
+      body: JSON.stringify({ event, data }),
+    });
+  } catch (error) {
+    console.error("Failed to emit socket event:", error);
+  }
 }
-
-// Backend socket (server)
-// export function getIO(): IOServer | undefined {
-//   return (globalThis as any).io as IOServer | undefined;
-// }
-// // src/lib/socket.ts
-// import { io, Socket } from "socket.io-client";
-// import type { Server as IOServer } from "socket.io";
-
-// let socket: Socket | null = null;
-
-// // Frontend socket (client)
-// export const getSocket = (): Socket => {
-//   if (!socket) {
-//     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000", {
-//       path: "/api/socket", // must match server.ts
-//       // FIX: Removed 'transports' property to resolve type error.
-//       reconnection: true,
-//       reconnectionAttempts: Infinity,
-//       reconnectionDelay: 2000,
-//     });
-
-//     // FIX: Cast socket to 'any' to resolve type errors with the 'on' method.
-//     (socket as any).on("connect", () => {
-//       console.log("✅ Socket connected:", socket!.id);
-//     });
-
-//     // FIX: Cast socket to 'any' to resolve type errors with the 'on' method.
-//     (socket as any).on("disconnect", (reason: any) => {
-//       console.log("❌ Socket disconnected:", reason);
-//     });
-//   }
-
-//   // If socket exists but is disconnected, try to reconnect.
-//   if (socket.disconnected) {
-//     socket.connect();
-//   }
-
-//   return socket;
-// };
-
-// // Backend socket (server)
-// export function getIO(): IOServer | undefined {
-//   return (globalThis as any).io as IOServer | undefined;
-// }
