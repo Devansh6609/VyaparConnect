@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth/next"
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import prisma from "@/lib/prisma"
-import bcrypt from "bcrypt"
+import { getServerSession } from "next-auth/next";
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "@/lib/prisma";
+import bcrypt from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -63,50 +63,35 @@ export const authOptions: NextAuthOptions = {
       // If user object exists, it's the initial sign-in.
       if (user) {
         token.id = user.id;
-      }
+      } // If token.id is not available, something is wrong, return the token.
 
-      // If token.id is not available, something is wrong, return the token.
       if (!token.id) {
         return token;
-      }
+      } // On every session access, re-fetch the user data from the DB. // This ensures the session is always fresh, which is crucial for // flows like onboarding where user data changes.
 
-      // On every session access, re-fetch the user data from the DB.
-      // This ensures the session is always fresh, which is crucial for
-      // flows like onboarding where user data changes.
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          hasCompletedOnboarding: true,
-          settings: {
-            select: {
-              primaryWorkflow: true,
-            },
-          },
-        },
+        include: { settings: true },
       });
 
       if (!dbUser) {
         // User not found in DB, invalidate the session by returning a modified token
-        token.id = undefined;
+        token.id = undefined as unknown as string; // FIX: Cast 'undefined' to 'string' to satisfy compiler
         return token;
-      }
+      } // Update the token with the latest data from the database
 
-      // Update the token with the latest data from the database
       return {
         ...token, // preserve original token properties like iat, exp
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
         hasCompletedOnboarding: dbUser.hasCompletedOnboarding,
-        primaryWorkflow: dbUser.settings?.primaryWorkflow || 'HYBRID',
+        primaryWorkflow: dbUser.settings?.primaryWorkflow || "HYBRID",
       };
     },
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
 };
 
