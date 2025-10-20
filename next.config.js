@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['razorpay', 'socket.io-client'],
+  transpilePackages: ['socket.io-client'],
   reactStrictMode: true,
   images: {
     remotePatterns: [
