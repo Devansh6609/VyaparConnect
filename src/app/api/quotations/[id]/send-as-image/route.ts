@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWhatsAppImageMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 
 async function saveAndEmitMessage(messageData: any) {
   const savedMessage = await prisma.message.create({

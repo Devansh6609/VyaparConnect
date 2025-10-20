@@ -1,3 +1,4 @@
+// src/app/chat/page.tsx
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -6,16 +7,14 @@ import ChatModule from "@/components/ChatModule";
 import RightPanel from "@/components/RightPanel";
 // FIX: Used type-only import to prevent module resolution errors.
 import type { Contact, Product, Message } from "../../types";
-import { getSocket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket-client";
 import { Socket } from "socket.io-client";
 import ChatPageSkeleton from "@/components/skeletons/ChatPageSkeleton";
 
 function ChatPageContent() {
     const searchParams = useSearchParams();
-
-    // FIX: Use optional chaining and nullish coalescing to handle potentially null searchParams
-    const contactIdFromUrl = searchParams?.get('contactId') ?? null;
-    const messageFromUrl = searchParams?.get('message') ?? null;
+    const contactIdFromUrl = searchParams.get('contactId');
+    const messageFromUrl = searchParams.get('message');
 
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [activeContact, setActiveContact] = useState<Contact | null>(null);
@@ -131,18 +130,16 @@ function ChatPageContent() {
             }
         };
 
-        // FIX: Cast socket to 'any' to resolve type errors with event listeners.
-        (socket as any).on("newMessage", handleNewMessage);
-        (socket as any).on("message-status-update", handleStatusUpdate);
-        (socket as any).on("deleteMessage", handleDeleteMessage);
-        (socket as any).on("contact_updated", handleContactUpdate);
+        socket.on("newMessage", handleNewMessage);
+        socket.on("message-status-update", handleStatusUpdate);
+        socket.on("deleteMessage", handleDeleteMessage);
+        socket.on("contact_updated", handleContactUpdate);
 
         return () => {
-            // FIX: Cast socket to 'any' to resolve type errors with event listeners.
-            (socket as any).off("newMessage", handleNewMessage);
-            (socket as any).off("message-status-update", handleStatusUpdate);
-            (socket as any).off("deleteMessage", handleDeleteMessage);
-            (socket as any).off("contact_updated", handleContactUpdate);
+            socket.off("newMessage", handleNewMessage);
+            socket.off("message-status-update", handleStatusUpdate);
+            socket.off("deleteMessage", handleDeleteMessage);
+            socket.off("contact_updated", handleContactUpdate);
         };
     }, [socket, activeContact, awaitingAddressResponseForOrder]);
 
@@ -172,7 +169,7 @@ function ChatPageContent() {
         setMessages(prev => [...prev, {
             id: `temp-${Date.now()}`, from: 'business', to: activeContact.phone, type: 'product',
             text: `Sharing ${product.name}...`, createdAt: new Date().toISOString(), contactId: activeContact.id, status: 'pending', product
-        } as Message]); // Cast to Message to satisfy type checker
+        }]);
         await fetch("/api/messages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

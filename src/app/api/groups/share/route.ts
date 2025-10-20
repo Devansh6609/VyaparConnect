@@ -1,7 +1,7 @@
 // src/app/api/groups/share/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import {
   sendWhatsAppMessage,
   sendWhatsAppImageMessage,

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 
 // Helper to send message via WhatsApp Graph API
 async function sendAndLogMessage(

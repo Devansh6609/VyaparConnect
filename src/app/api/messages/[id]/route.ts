@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 // FIX: Use the Prisma singleton instance to ensure a single connection pool and fix import errors.
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 
 export async function DELETE(
   _: Request,

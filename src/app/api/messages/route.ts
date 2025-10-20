@@ -7,7 +7,7 @@ import {
   sendWhatsAppDocumentMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import { getAuthSession } from "@/lib/auth";
 
 async function getUserWhatsAppCredentials(

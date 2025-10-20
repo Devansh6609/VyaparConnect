@@ -1,7 +1,7 @@
 // src/app/api/webhooks/whatsapp/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import { decrypt } from "@/lib/crypto";
 
 // Helper to get a temporary media URL from a WhatsApp media ID
@@ -153,7 +153,6 @@ export async function POST(req: Request) {
         });
 
         if (updatedMessage.count > 0) {
-          // Using the centralized emitSocketEvent helper
           await emitSocketEvent("message-status-update", {
             wamid,
             status: appStatus,
@@ -196,7 +195,6 @@ export async function POST(req: Request) {
             stage: "NEW_LEAD",
           },
         });
-        // Using the centralized emitSocketEvent helper
         await emitSocketEvent("new_lead", contact);
       }
       messageData.contactId = contact.id;
@@ -284,7 +282,6 @@ export async function POST(req: Request) {
       include: { contact: true },
     });
 
-    // Using the centralized emitSocketEvent helper
     await emitSocketEvent(
       isGroupMessage ? "newGroupMessage" : "newMessage",
       savedMessage

@@ -1,21 +1,17 @@
 // src/app/api/orders/[id]/send-payment-action/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import {
   sendWhatsAppImageMessage,
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-// REMOVED TOP-LEVEL IMPORTS FOR NODE-SPECIFIC PACKAGES:
-// import Razorpay from "razorpay";
-// import nodeHtmlToImage from "node-html-to-image";
+import Razorpay from "razorpay";
+import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
-import type { Order } from "../../../../../types"; // Keeping this import, but redefining the working type
+import type { Order } from "../../../../../types";
 import { getAuthSession } from "@/lib/auth";
-
-// IMPORT PRISMA'S UTILITY TYPES HERE
-import { Prisma } from "@prisma/client";
 
 interface Settings {
   companyName?: string | null;
@@ -31,20 +27,7 @@ interface Settings {
   whatsappPhoneNumberId?: string | null;
 }
 
-// 1. Define the selection structure used in the findFirst call (line 359)
-const orderInclude = {
-  contact: true,
-  items: true,
-  payments: true,
-} satisfies Prisma.OrderInclude;
-
-// 2. Use Prisma.Type to get the exact type returned by the query
-type OrderWithDetails = Prisma.OrderGetPayload<{
-  include: typeof orderInclude;
-}>;
-
-// The previous definition was: type OrderWithDetails = Order;
-// This is now replaced with a precise type matching the actual database return.
+type OrderWithDetails = Order;
 
 // --- HTML Template Helper ---
 function getBillHtml(
@@ -148,7 +131,7 @@ async function createAndSendMessage(messageData: any, sendFunction: Function) {
     data: { ...messageData, status: "pending" },
     include: { contact: true },
   });
-  getIO()?.emit("newMessage", savedMessage);
+  await emitSocketEvent("newMessage", savedMessage);
 
   const waResponse = await sendFunction();
   const wamid = waResponse?.messages?.[0]?.id;
@@ -158,7 +141,7 @@ async function createAndSendMessage(messageData: any, sendFunction: Function) {
     where: { id: savedMessage.id },
     data: { wamid: wamid, status: finalStatus },
   });
-  getIO()?.emit("message-status-update", {
+  await emitSocketEvent("message-status-update", {
     id: updatedMessage.id,
     status: finalStatus,
     wamid: wamid,
@@ -171,15 +154,11 @@ async function createAndSendMessage(messageData: any, sendFunction: Function) {
 
 async function handleAction(
   action: string,
-  order: OrderWithDetails, // Now uses the correct Prisma-generated type
+  order: OrderWithDetails,
   settings: Settings | null,
   creds: WhatsAppCredentials,
   amount?: number
 ) {
-  // Dynamically import node-html-to-image and Razorpay inside the server function
-  const { default: Razorpay } = await import("razorpay");
-  const { default: nodeHtmlToImage } = await import("node-html-to-image");
-
   const totalPaid = order.payments.reduce((sum, p) => sum + p.amount, 0);
   const amountDue = order.total - totalPaid;
 
@@ -373,10 +352,9 @@ export async function POST(
   try {
     const { action, amount } = await req.json();
 
-    // The include structure must match the type definition above
     const order = await prisma.order.findFirst({
       where: { id: orderId, userId: session.user.id },
-      include: orderInclude,
+      include: { contact: true, items: true, payments: true },
     });
 
     if (!order) {

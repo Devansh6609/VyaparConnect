@@ -1,7 +1,7 @@
 // src/app/api/orders/[id]/send-bill/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import { sendWhatsAppImageMessage, WhatsAppCredentials } from "@/lib/whatsapp";
 import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
@@ -217,7 +217,7 @@ export async function POST(
       },
       include: { contact: true },
     });
-    getIO()?.emit("newMessage", savedMessage);
+    await emitSocketEvent("newMessage", savedMessage);
 
     const waResponse = await sendWhatsAppImageMessage(
       order.contact.phone,
@@ -233,7 +233,7 @@ export async function POST(
       where: { id: savedMessage.id },
       data: { wamid: wamid, status: finalStatus },
     });
-    getIO()?.emit("message-status-update", {
+    await emitSocketEvent("message-status-update", {
       id: updatedMessage.id,
       status: finalStatus,
       wamid: wamid,
