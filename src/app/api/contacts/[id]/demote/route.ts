@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 
 export async function POST(
   _req: Request,
@@ -15,7 +15,7 @@ export async function POST(
       },
     });
 
-    getIO()?.emit("contact_updated", updatedContact);
+    await emitSocketEvent("contact_updated", updatedContact);
 
     return NextResponse.json(updatedContact, { status: 200 });
   } catch (error) {

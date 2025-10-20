@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 import { getAuthSession } from "@/lib/auth";
 
 async function getUserWhatsAppCredentials(
@@ -94,7 +94,7 @@ export async function POST(
         status: wamid ? "sent" : "failed",
       },
     });
-    getIO()?.emit("newMessage", savedMessage);
+    await emitSocketEvent("newMessage", savedMessage);
 
     // 4. Update quotation status
     const updatedQuotation = await prisma.quotation.update({

@@ -1,7 +1,7 @@
 // src/app/api/quotations/[id]/payments/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
 
 async function getUserWhatsAppCredentials(
@@ -120,20 +120,18 @@ export async function POST(
         );
         const wamid = waResponse?.messages?.[0]?.id;
 
-        getIO()?.emit(
-          "newMessage",
-          await prisma.message.create({
-            data: {
-              from: "business",
-              to: quotation.contact.phone,
-              type: "text",
-              text: confirmationText,
-              contactId: quotation.contact.id,
-              wamid: wamid,
-              status: wamid ? "sent" : "failed",
-            },
-          })
-        );
+        const savedMessage = await prisma.message.create({
+          data: {
+            from: "business",
+            to: quotation.contact.phone,
+            type: "text",
+            text: confirmationText,
+            contactId: quotation.contact.id,
+            wamid: wamid,
+            status: wamid ? "sent" : "failed",
+          },
+        });
+        await emitSocketEvent("newMessage", savedMessage);
       } else {
         console.warn(
           `Could not send WhatsApp confirmation for quotation ${quotationId} - no credentials found for user ${quotation.contact.userId}`
@@ -150,7 +148,7 @@ export async function POST(
       where: { id: quotationId },
       include: { payments: true },
     });
-    getIO()?.emit("quotation_update", updatedQuotationWithPayments);
+    await emitSocketEvent("quotation_update", updatedQuotationWithPayments);
 
     return NextResponse.json(updatedQuotationWithPayments, { status: 201 });
   } catch (error) {

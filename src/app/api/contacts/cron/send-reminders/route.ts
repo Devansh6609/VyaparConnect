@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 
 // Helper to send message via WhatsApp Graph API
 async function sendAndLogMessage(
@@ -24,10 +24,10 @@ async function sendAndLogMessage(
         text: `[Automated Reminder] ${text}`,
         contactId: contactId,
         wamid: wamid,
-        status: wamid ? "sent" : "failed",
+        status: wamid ? "sent" : "failed", // FIX: Added required status field
       },
     });
-    getIO()?.emit("newMessage", savedMessage);
+    await emitSocketEvent("newMessage", savedMessage);
 
     return { success: !!wamid };
   } catch (err) {

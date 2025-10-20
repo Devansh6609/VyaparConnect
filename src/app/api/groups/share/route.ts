@@ -1,7 +1,7 @@
 // src/app/api/groups/share/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket";
 import {
   sendWhatsAppMessage,
   sendWhatsAppImageMessage,
@@ -122,7 +122,9 @@ export async function POST(req: Request) {
           finalMessages.push(savedTextMsg);
 
           // Emit messages to UI optimistically
-          finalMessages.forEach((msg) => getIO()?.emit("newMessage", msg));
+          for (const msg of finalMessages) {
+            await emitSocketEvent("newMessage", msg);
+          }
 
           // 3. Send to WhatsApp and update statuses
           for (const image of product.images) {
@@ -144,7 +146,7 @@ export async function POST(req: Request) {
               where: { id: imageMessage.id },
               data: { wamid, status: newStatus },
             });
-            getIO()?.emit("message-status-update", {
+            await emitSocketEvent("message-status-update", {
               id: updatedMsg.id,
               status: newStatus,
               wamid,
@@ -163,7 +165,7 @@ export async function POST(req: Request) {
             where: { id: savedTextMsg.id },
             data: { wamid, status: newStatus },
           });
-          getIO()?.emit("message-status-update", {
+          await emitSocketEvent("message-status-update", {
             id: updatedMsg.id,
             status: newStatus,
             wamid,

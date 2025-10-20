@@ -7,7 +7,6 @@ import {
   sendWhatsAppImageMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
 
 async function getUserWhatsAppCredentials(
   userId: string
