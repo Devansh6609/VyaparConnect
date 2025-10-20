@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWhatsAppMessage, WhatsAppCredentials } from "@/lib/whatsapp";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socket-server";
 import { getAuthSession } from "@/lib/auth";
 
 async function getUserWhatsAppCredentials(
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
         status: wamid ? "sent" : "failed",
       },
     });
-    getIO()?.emit("newMessage", savedMessage);
+    await emitSocketEvent("newMessage", savedMessage);
 
     // 3. Update quotation timestamp to prevent it from reappearing in follow-ups immediately
     await prisma.quotation.update({
