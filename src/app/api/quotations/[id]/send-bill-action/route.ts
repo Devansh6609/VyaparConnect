@@ -6,8 +6,9 @@ import {
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-import Razorpay from "razorpay";
-import nodeHtmlToImage from "node-html-to-image";
+// REMOVED TOP-LEVEL IMPORTS FOR NODE-SPECIFIC PACKAGES:
+// import Razorpay from "razorpay";
+// import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 import type { Quotation } from "../../../../../types"; // Keeping this for reference/compatibility
 import { getAuthSession } from "@/lib/auth";
@@ -197,6 +198,9 @@ async function handleSendFinalBill(
   settings: Settings | null,
   creds: WhatsAppCredentials
 ) {
+  // Dynamic import for node-html-to-image
+  const { default: nodeHtmlToImage } = await import("node-html-to-image");
+
   const html = getBillHtml(quotation, settings);
   const buffer = (await nodeHtmlToImage({
     html,
@@ -245,6 +249,9 @@ async function handleSendRazorpay(
   amount: number,
   creds: WhatsAppCredentials
 ) {
+  // Dynamic import for Razorpay
+  const { default: Razorpay } = await import("razorpay");
+
   if (!settings?.razorpayKeyId || !settings?.razorpayKeySecret) {
     throw new Error("Razorpay API keys are not configured in settings.");
   }

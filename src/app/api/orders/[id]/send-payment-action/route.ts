@@ -7,8 +7,9 @@ import {
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-import Razorpay from "razorpay";
-import nodeHtmlToImage from "node-html-to-image";
+// REMOVED TOP-LEVEL IMPORTS FOR NODE-SPECIFIC PACKAGES:
+// import Razorpay from "razorpay";
+// import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 import type { Order } from "../../../../../types"; // Keeping this import, but redefining the working type
 import { getAuthSession } from "@/lib/auth";
@@ -175,6 +176,10 @@ async function handleAction(
   creds: WhatsAppCredentials,
   amount?: number
 ) {
+  // Dynamically import node-html-to-image and Razorpay inside the server function
+  const { default: Razorpay } = await import("razorpay");
+  const { default: nodeHtmlToImage } = await import("node-html-to-image");
+
   const totalPaid = order.payments.reduce((sum, p) => sum + p.amount, 0);
   const amountDue = order.total - totalPaid;
 

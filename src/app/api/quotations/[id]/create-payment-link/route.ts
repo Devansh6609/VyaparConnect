@@ -1,20 +1,35 @@
 // src/app/api/quotations/[id]/create-payment-link/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import Razorpay from "razorpay";
+// REMOVED: import Razorpay from "razorpay";
 
-const keyId = process.env.RAZORPAY_KEY_ID || "";
-const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
-
-const razorpay = new Razorpay({
-  key_id: keyId,
-  key_secret: keySecret,
-});
+// The constants and initialization need to move inside POST
+// const keyId = process.env.RAZORPAY_KEY_ID || "";
+// const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
+// const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret, });
 
 export async function POST(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  // Dynamic import of Razorpay inside the server function
+  const { default: Razorpay } = await import("razorpay");
+
+  const keyId = process.env.RAZORPAY_KEY_ID || "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
+
+  if (!keyId || !keySecret) {
+    return NextResponse.json(
+      { error: "Razorpay keys are not configured in environment variables." },
+      { status: 500 }
+    );
+  }
+
+  const razorpay = new Razorpay({
+    key_id: keyId,
+    key_secret: keySecret,
+  });
+
   const { id: quotationId } = await context.params;
   try {
     const quotation = await prisma.quotation.findUnique({
