@@ -1,12 +1,10 @@
 module.exports = {
-  // Use the 'plugins' object structure which is standard for PostCSS 8+
-  plugins: {
-    // 1. Tailwind CSS plugin
-    // This tells PostCSS to look for the tailwind.config.js file and apply the rules.
-    tailwindcss: {},
+  // Switch to the array format for more explicit plugin loading
+  plugins: [
+    // 1. Tailwind CSS (This should automatically resolve to the correct PostCSS plugin)
+    'tailwindcss', 
     
-    // 2. Autoprefixer plugin
-    // This automatically adds vendor prefixes to CSS rules for browser compatibility.
-    autoprefixer: {},
-  },
+    // 2. Autoprefixer
+    'autoprefixer',
+  ],
 };
