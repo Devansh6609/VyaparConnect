@@ -7,13 +7,14 @@ import {
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-// FIX: Removed top-level imports for Node-specific modules
-// import Razorpay from "razorpay";
-// import nodeHtmlToImage from "node-html-to-image";
+// Node-specific Buffer import must remain
 import { Buffer } from "node:buffer";
-import type { Quotation } from "../../../../../types";
 import { getAuthSession } from "@/lib/auth";
 
+// --- NEW IMPORT: Use Prisma types for precise data structure ---
+import { Prisma } from "@prisma/client";
+
+// Re-defining Settings locally as it is not exported from @prisma/client in this environment.
 interface Settings {
   companyName?: string | null;
   companyAddress?: string | null;
@@ -28,7 +29,17 @@ interface Settings {
   whatsappPhoneNumberId?: string | null;
 }
 
-type QuotationWithDetails = Quotation;
+// 1. Define the selection structure used in the findUnique call
+const quotationInclude = {
+  contact: true, // <-- CRITICAL FIX: Ensures 'contact' object is loaded for TypeScript
+  items: { include: { product: true } },
+  payments: true,
+} satisfies Prisma.QuotationInclude;
+
+// 2. Use Prisma.Type to get the exact type returned by the query
+type QuotationWithDetails = Prisma.QuotationGetPayload<{
+  include: typeof quotationInclude;
+}>;
 
 // --- HTML Template Helper ---
 function getBillHtml(
@@ -213,7 +224,7 @@ async function handleSendFinalBill(
   await createAndSendMessage(
     {
       from: "business",
-      to: quotation.contact.phone,
+      to: quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
       type: "image",
       text: caption,
       mediaUrl: publicImageUrl,
@@ -221,7 +232,7 @@ async function handleSendFinalBill(
     },
     () =>
       sendWhatsAppImageMessage(
-        quotation.contact.phone,
+        quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
         publicImageUrl,
         caption,
         creds
@@ -312,7 +323,7 @@ async function handleSendRazorpay(
   await createAndSendMessage(
     {
       from: "business",
-      to: quotation.contact.phone,
+      to: quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
       type: "image",
       text: caption,
       mediaUrl: publicQrUrl,
@@ -320,7 +331,7 @@ async function handleSendRazorpay(
     },
     () =>
       sendWhatsAppImageMessage(
-        quotation.contact.phone,
+        quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
         publicQrUrl,
         caption,
         creds
@@ -353,12 +364,12 @@ async function handleSendBankDetails(
   await createAndSendMessage(
     {
       from: "business",
-      to: quotation.contact.phone,
+      to: quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
       type: "text",
       text: messageText,
       contactId: quotation.contact.id,
     },
-    () => sendWhatsAppMessage(quotation.contact.phone, messageText, creds)
+    () => sendWhatsAppMessage(quotation.contact.phone, messageText, creds) // FIX APPLIED HERE VIA PRISMA TYPE
   );
 }
 
@@ -380,7 +391,7 @@ async function handleSendQrCode(
   await createAndSendMessage(
     {
       from: "business",
-      to: quotation.contact.phone,
+      to: quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
       type: "image",
       text: caption,
       mediaUrl: settings.upiQrCodeUrl,
@@ -388,7 +399,7 @@ async function handleSendQrCode(
     },
     () =>
       sendWhatsAppImageMessage(
-        quotation.contact.phone,
+        quotation.contact.phone, // FIX APPLIED HERE VIA PRISMA TYPE
         settings!.upiQrCodeUrl!,
         caption,
         creds
@@ -412,14 +423,11 @@ export async function POST(
 
     const quotation = await prisma.quotation.findUnique({
       where: { id: quotationId },
-      include: {
-        contact: true,
-        items: { include: { product: true } },
-        payments: true,
-      },
+      include: quotationInclude, // Using the shared inclusion structure
     });
 
     if (!quotation || !quotation.contact) {
+      // The type checker ensures quotation.contact exists, but this runtime check is wise.
       return NextResponse.json(
         { error: "Quotation not found" },
         { status: 404 }
