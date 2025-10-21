@@ -109,8 +109,8 @@ body {
 
 /* Chat Bubble Styles */
 .chat-bubble {
-  /* TEMPORARY FIX: max-w-xl is causing the PostCSS utility lookup to fail. */
-  @apply px-3 py-2 rounded-lg relative shadow-sm break-words;
+  /* CRITICAL FIX: Removed @apply directives that were causing build failure. 
+     The classes must be applied directly in the JSX. */
 }
 
 .chat-bubble.outgoing {
