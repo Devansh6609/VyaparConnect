@@ -3,204 +3,204 @@
 @tailwind utilities;
 
 :root {
-  /* ✨ NEW: "Modern Slate" Signature Theme (Default) ✨ */
-  --background: #f7f7f8; /* Light, neutral gray */
-  --card-background: #ffffff;
-  --card-border: #e9e9ea;
-  --input-background: #ffffff;
-  --sidebar-background: #ffffff;
-  --header-background: #ffffff;
-  --header-border: #e9e9ea;
-  --text-primary: #18181b; /* Strong, near-black for high contrast on white */
-  --text-secondary: #71717a;
-  --text-tertiary: #a1a1aa;
-  --outgoing-bubble-bg: #dcf8c6;
-  --incoming-bubble-bg: #ffffff;
-  --chat-page-bg: #f0f2f5; /* A clean, solid chat background */
+  /* ✨ NEW: "Modern Slate" Signature Theme (Default) ✨ */
+  --background: #f7f7f8; /* Light, neutral gray */
+  --card-background: #ffffff;
+  --card-border: #e9e9ea;
+  --input-background: #ffffff;
+  --sidebar-background: #ffffff;
+  --header-background: #ffffff;
+  --header-border: #e9e9ea;
+  --text-primary: #18181b; /* Strong, near-black for high contrast on white */
+  --text-secondary: #71717a;
+  --text-tertiary: #a1a1aa;
+  --outgoing-bubble-bg: #dcf8c6;
+  --incoming-bubble-bg: #ffffff;
+  --chat-page-bg: #f0f2f5; /* A clean, solid chat background */
 }
 
 .sunrise-glow {
-  /* ✨ NEW: "Sunrise Glow" Theme ✨ */
-  --background: #FFFBF5; /* Almond white */
-  --card-background: #FFFFFF;
-  --card-border: #FDEFEF5; /* Soft peach-tinted border */
-  --input-background: #FFFFFF;
-  --sidebar-background: #FFFFFF;
-  --header-background: #FFFFFF;
-  --header-border: #FDEFEF5;
-  --text-primary: #5D4037; /* Deep Brown */
-  --text-secondary: #795548; /* Medium Brown */
-  --text-tertiary: #A1887F; /* Light Brown */
-  --outgoing-bubble-bg: #FFE0B2; /* Soft Orange/Peach */
-  --incoming-bubble-bg: #FFFFFF;
-  --chat-page-bg: #FFF0E6; /* Very light peach */
+  /* ✨ NEW: "Sunrise Glow" Theme ✨ */
+  --background: #FFFBF5; /* Almond white */
+  --card-background: #FFFFFF;
+  --card-border: #FDEFEF5; /* Soft peach-tinted border */
+  --input-background: #FFFFFF;
+  --sidebar-background: #FFFFFF;
+  --header-background: #FFFFFF;
+  --header-border: #FDEFEF5;
+  --text-primary: #5D4037; /* Deep Brown */
+  --text-secondary: #795548; /* Medium Brown */
+  --text-tertiary: #A1887F; /* Light Brown */
+  --outgoing-bubble-bg: #FFE0B2; /* Soft Orange/Peach */
+  --incoming-bubble-bg: #FFFFFF;
+  --chat-page-bg: #FFF0E6; /* Very light peach */
 }
 
 
 .light {
-  /* Light mode palette (old default) */
-  --background: #f0f2f5;
-  --card-background: #ffffff;
-  --card-border: #e2e8f0;
-  --input-background: #ffffff;
-  --sidebar-background: #ffffff;
-  --header-background: #ffffff;
-  --header-border: #e2e8f0;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --outgoing-bubble-bg: #dcf8c6;
-  --incoming-bubble-bg: #ffffff;
-  --chat-page-bg: #E5DDD5;
+  /* Light mode palette (old default) */
+  --background: #f0f2f5;
+  --card-background: #ffffff;
+  --card-border: #e2e8f0;
+  --input-background: #ffffff;
+  --sidebar-background: #ffffff;
+  --header-background: #ffffff;
+  --header-border: #e2e8f0;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --outgoing-bubble-bg: #dcf8c6;
+  --incoming-bubble-bg: #ffffff;
+  --chat-page-bg: #E5DDD5;
 }
 
 .dark {
-  /* Refined dark mode palette inspired by WhatsApp for better contrast and feel */
-  --background: #111b21;
-  --card-background: #202c33;
-  --card-border: #2a3942;
-  --input-background: #2a3942;
-  --sidebar-background: #111b21;
-  --header-background: #202c33;
-  --header-border: #2a3942;
-  --text-primary: #e9edef;
-  --text-secondary: #c0c6cc; /* Brighter for better readability */
-  --text-tertiary: #a0a6ac; /* Brighter for better readability */
-  --outgoing-bubble-bg: #005c4b;
-  --incoming-bubble-bg: #202c33;
-  --chat-page-bg: #0b141a;
+  /* Refined dark mode palette inspired by WhatsApp for better contrast and feel */
+  --background: #111b21;
+  --card-background: #202c33;
+  --card-border: #2a3942;
+  --input-background: #2a3942;
+  --sidebar-background: #111b21;
+  --header-background: #202c33;
+  --header-border: #2a3942;
+  --text-primary: #e9edef;
+  --text-secondary: #c0c6cc; /* Brighter for better readability */
+  --text-tertiary: #a0a6ac; /* Brighter for better readability */
+  --outgoing-bubble-bg: #005c4b;
+  --incoming-bubble-bg: #202c33;
+  --chat-page-bg: #0b141a;
 }
 
 
 body {
-  background: var(--background);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Chat Background: Solid color by default, doodle for light/dark themes */
 .chat-background {
-  background-color: var(--chat-page-bg);
-  position: relative;
-  isolation: isolate;
+  background-color: var(--chat-page-bg);
+  position: relative;
+  isolation: isolate;
 }
 
 .chat-background::before {
-  content: none; /* The default Signature theme has no doodle pattern */
+  content: none; /* The default Signature theme has no doodle pattern */
 }
 
 .light .chat-background::before,
 .dark .chat-background::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
 }
 
 .light .chat-background::before {
-  opacity: 1; /* Full opacity pattern for light mode */
+  opacity: 1; /* Full opacity pattern for light mode */
 }
 
 .dark .chat-background::before {
-  opacity: 0.06; /* Subtle pattern for dark mode */
+  opacity: 0.06; /* Subtle pattern for dark mode */
 }
 
 
 /* Chat Bubble Styles */
 .chat-bubble {
-    /* TEMPORARY FIX: max-w-xl is causing the PostCSS utility lookup to fail. */
-    @apply px-3 py-2 rounded-lg relative shadow-sm break-words;
+  /* TEMPORARY FIX: max-w-xl is causing the PostCSS utility lookup to fail. */
+  @apply px-3 py-2 rounded-lg relative shadow-sm break-words;
 }
 
 .chat-bubble.outgoing {
-    @apply bg-[var(--outgoing-bubble-bg)] text-black;
+  @apply bg-[var(--outgoing-bubble-bg)] text-black;
 }
 .dark .chat-bubble.outgoing {
-    /* Use primary text color for high contrast on dark teal */
-    color: var(--text-primary);
+  /* Use primary text color for high contrast on dark teal */
+  color: var(--text-primary);
 }
 .sunrise-glow .chat-bubble.outgoing {
-    /* Use a darker text color for readability on the light orange bubble */
-    color: #5D4037;
+  /* Use a darker text color for readability on the light orange bubble */
+  color: #5D4037;
 }
 
 .chat-bubble.incoming {
-    @apply bg-[var(--incoming-bubble-bg)] text-[var(--text-primary)];
+  @apply bg-[var(--incoming-bubble-bg)] text-[var(--text-primary)];
 }
 
 /* Animations */
 @keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
-    animation: fade-in-up 0.3s ease-out forwards;
+  animation: fade-in-up 0.3s ease-out forwards;
 }
 
 /* Highlight effect for scrolled-to message */
 @keyframes highlight-fade {
-  0% { background-color: rgba(0, 123, 255, 0.25); }
-  100% { background-color: transparent; }
+  0% { background-color: rgba(0, 123, 255, 0.25); }
+  100% { background-color: transparent; }
 }
 
 .highlight-message .chat-bubble {
-  animation: highlight-fade 1.5s ease-out forwards;
+  animation: highlight-fade 1.5s ease-out forwards;
 }
 
 
 .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 /* VyaparConnect Loader Animations */
 @keyframes vc-draw-v {
-  to {
-    stroke-dashoffset: 0;
-  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes vc-pulse-bubble {
-  50% {
-    transform: scale(1.03);
-  }
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 @keyframes vc-blink-ellipsis {
-  50% {
-    opacity: 0.2;
-  }
+  50% {
+    opacity: 0.2;
+  }
 }
 
 /* Custom scrollbar for webkit browsers */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 20px;
-  border: transparent;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: transparent;
 }
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
