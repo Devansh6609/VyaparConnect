@@ -3,16 +3,11 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 // REMOVED: import Razorpay from "razorpay";
 
-// The constants and initialization need to move inside POST
-// const keyId = process.env.RAZORPAY_KEY_ID || "";
-// const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
-// const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret, });
-
 export async function POST(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  // Dynamic import of Razorpay inside the server function
+  // CRITICAL FIX: Dynamic import of Razorpay inside the server function
   const { default: Razorpay } = await import("razorpay");
 
   const keyId = process.env.RAZORPAY_KEY_ID || "";
