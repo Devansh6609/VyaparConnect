@@ -1,14 +1,14 @@
 // src/app/api/orders/[id]/send-payment-action/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket-server"; // CORRECTED IMPORT PATH
+import { emitSocketEvent } from "@/lib/socket-server";
 import {
   sendWhatsAppImageMessage,
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-// REMOVED: import Razorpay from "razorpay";
-// REMOVED: import nodeHtmlToImage from "node-html-to-image";
+import Razorpay from "razorpay";
+import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 import type { Order } from "../../../../../types";
 import { getAuthSession } from "@/lib/auth";
@@ -41,87 +41,89 @@ function getBillHtml(
   const discountAmount = (subtotal * (order.discountPercentage || 0)) / 100;
 
   return `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 40px; width: 600px; background-color: #f9f9f9; color: #333; }
-            .container { border: 1px solid #eee; background-color: white; padding: 30px; border-radius: 8px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-            .company-details { font-size: 12px; color: #555; }
-            .bill-details { text-align: right; font-size: 12px; }
-            .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-            .table th, .table td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; }
-            .table th { background-color: #f7fafc; font-weight: bold; }
-            .totals { float: right; width: 50%; margin-top: 20px; font-size: 14px; }
-            .totals div { display: flex; justify-content: space-between; padding: 5px 0; }
-            .grand-total { font-size: 18px; font-weight: bold; border-top: 2px solid #333; margin-top: 5px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div>
-                ${
-    settings?.companyLogoUrl
-      ? `<img src="${settings.companyLogoUrl}" alt="logo" style="max-width: 150px; margin-bottom: 10px;"/>`
-      : ""
-  }
-                <div class="company-details">
-                  <strong>${
-    settings?.companyName || "Your Company"
-  }</strong><br/>
-                  ${settings?.companyAddress?.replace(/\n/g, "<br/>") || ""}
-                </div>
-              </div>
-              <div class="bill-details">
-                <h2>INVOICE</h2>
-                <strong>Bill to:</strong> ${order.customerName}<br/>
-                <strong>Order ID:</strong> #${order.id.substring(0, 6)}<br/>
-                <strong>Date:</strong> ${new Date(
-    order.createdAt
-  ).toLocaleDateString()}
-              </div>
-            </div>
-            <table class="table">
-              <thead><tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th></tr></thead>
-              <tbody>
-                ${order.items
-    .map(
-      (item) => `
-                  <tr>
-                    <td>${item.productName}</td>
-                    <td style="text-align:center;">${item.quantity}</td>
-                    <td style="text-align:right;">₹${item.price.toFixed(2)}</td>
-                  </tr>`
-    )
-    .join("")}
-              </tbody>
-            </table>
-            <div class="totals">
-              <div><span>Subtotal</span><span>₹${subtotal.toFixed(
-    2
-  )}</span></div>
-              ${
-    order.discountPercentage
-      ? `<div><span>Discount (${
-          order.discountPercentage
-        }%)</span><span>- ₹${discountAmount.toFixed(2)}</span></div>`
-      : ""
-  }
-              ${
-    order.deliveryCharges
-      ? `<div><span>Delivery</span><span>+ ₹${order.deliveryCharges.toFixed(
-          2
-        )}</span></div>`
-      : ""
-  }
-              <div class="grand-total"><span>Grand Total</span><span>₹${order.total.toFixed(
-    2
-  )}</span></div>
-            </div>
-          </div>
-        </body>
-      </html>`;
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; width: 600px; background-color: #f9f9f9; color: #333; }
+            .container { border: 1px solid #eee; background-color: white; padding: 30px; border-radius: 8px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+            .company-details { font-size: 12px; color: #555; }
+            .bill-details { text-align: right; font-size: 12px; }
+            .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+            .table th, .table td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+            .table th { background-color: #f7fafc; font-weight: bold; }
+            .totals { float: right; width: 50%; margin-top: 20px; font-size: 14px; }
+            .totals div { display: flex; justify-content: space-between; padding: 5px 0; }
+            .grand-total { font-size: 18px; font-weight: bold; border-top: 2px solid #333; margin-top: 5px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div>
+                ${
+                  settings?.companyLogoUrl
+                    ? `<img src="${settings.companyLogoUrl}" alt="logo" style="max-width: 150px; margin-bottom: 10px;"/>`
+                    : ""
+                }
+                <div class="company-details">
+                  <strong>${
+                    settings?.companyName || "Your Company"
+                  }</strong><br/>
+                  ${settings?.companyAddress?.replace(/\n/g, "<br/>") || ""}
+                </div>
+              </div>
+              <div class="bill-details">
+                <h2>INVOICE</h2>
+                <strong>Bill to:</strong> ${order.customerName}<br/>
+                <strong>Order ID:</strong> #${order.id.substring(0, 6)}<br/>
+                <strong>Date:</strong> ${new Date(
+                  order.createdAt
+                ).toLocaleDateString()}
+              </div>
+            </div>
+            <table class="table">
+              <thead><tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th></tr></thead>
+              <tbody>
+                ${order.items
+                  .map(
+                    (item) => `
+                  <tr>
+                    <td>${item.productName}</td>
+                    <td style="text-align:center;">${item.quantity}</td>
+                    <td style="text-align:right;">₹${item.price.toFixed(2)}</td>
+                  </tr>`
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+            <div class="totals">
+              <div><span>Subtotal</span><span>₹${subtotal.toFixed(
+                2
+              )}</span></div>
+              ${
+                order.discountPercentage
+                  ? `<div><span>Discount (${
+                      order.discountPercentage
+                    }%)</span><span>- ₹${discountAmount.toFixed(
+                      2
+                    )}</span></div>`
+                  : ""
+              }
+              ${
+                order.deliveryCharges
+                  ? `<div><span>Delivery</span><span>+ ₹${order.deliveryCharges.toFixed(
+                      2
+                    )}</span></div>`
+                  : ""
+              }
+              <div class="grand-total"><span>Grand Total</span><span>₹${order.total.toFixed(
+                2
+              )}</span></div>
+            </div>
+          </div>
+        </body>
+      </html>`;
 }
 
 async function createAndSendMessage(messageData: any, sendFunction: Function) {
@@ -157,10 +159,6 @@ async function handleAction(
   creds: WhatsAppCredentials,
   amount?: number
 ) {
-  // CRITICAL FIX: Dynamic imports for Node.js-specific modules
-  const [{ default: Razorpay }, { default: nodeHtmlToImage }] =
-    await Promise.all([import("razorpay"), import("node-html-to-image")]);
-
   const totalPaid = order.payments.reduce((sum, p) => sum + p.amount, 0);
   const amountDue = order.total - totalPaid;
 
@@ -168,7 +166,6 @@ async function handleAction(
     case "send_bill_image": {
       const html = getBillHtml(order, settings);
       const buffer = (await nodeHtmlToImage({
-        // nodeHtmlToImage is dynamically available here
         html,
         puppeteerArgs: { args: ["--no-sandbox"] },
       })) as Buffer;
@@ -212,13 +209,10 @@ async function handleAction(
       if (!settings?.razorpayKeyId || !settings?.razorpayKeySecret)
         throw new Error("Razorpay API keys are not configured.");
       if (amountDue <= 0) throw new Error("The bill is already paid in full.");
-
-      // Razorpay is dynamically available here
       const razorpay = new Razorpay({
         key_id: settings.razorpayKeyId,
         key_secret: settings.razorpayKeySecret,
       });
-
       const paymentLink = await razorpay.paymentLink.create({
         amount: Math.round(amountDue * 100),
         currency: "INR",
@@ -379,7 +373,13 @@ export async function POST(
         : null;
     if (!creds) throw new Error("WhatsApp API credentials are not configured.");
 
-    await handleAction(action, order, settings, creds, amount);
+    await handleAction(
+      action,
+      order as unknown as OrderWithDetails,
+      settings,
+      creds,
+      amount
+    );
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
