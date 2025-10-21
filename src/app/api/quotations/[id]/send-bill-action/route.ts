@@ -1,13 +1,15 @@
+// src/app/api/quotations/[id]/send-bill-action/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket-server";
+import { emitSocketEvent } from "@/lib/socket-server"; // CORRECTED IMPORT PATH
 import {
   sendWhatsAppImageMessage,
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-// REMOVED: import Razorpay from "razorpay";
-// REMOVED: import nodeHtmlToImage from "node-html-to-image";
+// FIX: Removed top-level imports for Node-specific modules
+// import Razorpay from "razorpay";
+// import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 import type { Quotation } from "../../../../../types";
 import { getAuthSession } from "@/lib/auth";

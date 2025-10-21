@@ -1,15 +1,14 @@
 // src/app/api/orders/[id]/send-payment-action/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { emitSocketEvent } from "@/lib/socket-server";
+import { emitSocketEvent } from "@/lib/socket-server"; // CORRECTED IMPORT PATH
 import {
   sendWhatsAppImageMessage,
   sendWhatsAppMessage,
   WhatsAppCredentials,
 } from "@/lib/whatsapp";
-// FIX: Removed top-level imports for Node-specific modules to resolve Vercel build errors
-// import Razorpay from "razorpay";
-// import nodeHtmlToImage from "node-html-to-image";
+// REMOVED: import Razorpay from "razorpay";
+// REMOVED: import nodeHtmlToImage from "node-html-to-image";
 import { Buffer } from "node:buffer";
 import type { Order } from "../../../../../types";
 import { getAuthSession } from "@/lib/auth";
@@ -158,7 +157,7 @@ async function handleAction(
   creds: WhatsAppCredentials,
   amount?: number
 ) {
-  // CRITICAL FIX: Dynamic imports for Node.js-specific modules (Razorpay and node-html-to-image)
+  // CRITICAL FIX: Dynamic imports for Node.js-specific modules
   const [{ default: Razorpay }, { default: nodeHtmlToImage }] =
     await Promise.all([import("razorpay"), import("node-html-to-image")]);
 
