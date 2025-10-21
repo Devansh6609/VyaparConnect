@@ -1,10 +1,11 @@
 module.exports = {
-  // Switch to the array format for more explicit plugin loading
   plugins: [
-    // 1. Tailwind CSS (This should automatically resolve to the correct PostCSS plugin)
-    'tailwindcss', 
+    // CRITICAL FIX: Use 'require' to explicitly load the Tailwind PostCSS plugin.
+    // This tells PostCSS exactly where to find the Tailwind plugin logic,
+    // bypassing environment confusion over string loading.
+    require('tailwindcss'),
     
-    // 2. Autoprefixer
-    'autoprefixer',
+    // Autoprefixer remains loaded explicitly.
+    require('autoprefixer'),
   ],
 };
