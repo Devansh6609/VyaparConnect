@@ -13,8 +13,9 @@ import ChatPageSkeleton from "@/components/skeletons/ChatPageSkeleton";
 
 function ChatPageContent() {
     const searchParams = useSearchParams();
-    const contactIdFromUrl = searchParams.get('contactId');
-    const messageFromUrl = searchParams.get('message');
+    // FIX: Add optional chaining (?) to safely access methods on searchParams.
+    const contactIdFromUrl = searchParams?.get('contactId');
+    const messageFromUrl = searchParams?.get('message');
 
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [activeContact, setActiveContact] = useState<Contact | null>(null);
@@ -169,7 +170,7 @@ function ChatPageContent() {
         setMessages(prev => [...prev, {
             id: `temp-${Date.now()}`, from: 'business', to: activeContact.phone, type: 'product',
             text: `Sharing ${product.name}...`, createdAt: new Date().toISOString(), contactId: activeContact.id, status: 'pending', product
-        }]);
+        } as Message]); // Cast to Message
         await fetch("/api/messages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -247,6 +248,7 @@ function ChatPageContent() {
 
 export default function ChatPage() {
     return (
+        // The Suspense boundary ensures useSearchParams is ready
         <Suspense fallback={<ChatPageSkeleton />}>
             <ChatPageContent />
         </Suspense>
