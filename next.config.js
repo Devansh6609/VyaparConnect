@@ -1,18 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['socket.io-client'],
-  reactStrictMode: true,
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'i.imgur.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-      },
-    ],
+  // Add this block to ignore the problematic packages during client build
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Exclude these packages from the client-side bundle
+      config.externals.push(
+        'node-html-to-image', 
+        'handlebars', 
+        'puppeteer'
+      );
+    }
+    return config;
   },
 };
 
