@@ -1,6 +1,7 @@
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
-    autoprefixer: {},
+    // This is the standard string-based object syntax Next.js accepts.
+    'tailwindcss': {},
+    'autoprefixer': {},
   },
-}
+};
