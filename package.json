@@ -1,17 +1,14 @@
 {
-  "name": "vyapar-connect-next",
+  "name": "vyapar-connect",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-<<<<<<< HEAD
     "dev": "nodemon",
     "build": "next build && tsc --project tsconfig.server.json",
     "start": "node dist/server.js",
-=======
     "dev": "next dev",
     "build": "npx prisma generate --schema=prisma/schema.prisma && next build",
     "start": "next start",
->>>>>>> 2c7c28694180ce36c4447fa1db23590313b8ac6e
     "lint": "next lint",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate"
