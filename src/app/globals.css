@@ -75,7 +75,6 @@
 body {
   background: var(--background);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Chat Background: Solid color by default, doodle for light/dark themes */
@@ -109,12 +108,7 @@ body {
 
 /* Chat Bubble Styles */
 .chat-bubble {
-  max-width: theme('maxWidth.xl');
-  padding: theme('spacing.2') theme('spacing.3');
-  border-radius: theme('borderRadius.lg');
-  position: relative;
-  box-shadow: theme('boxShadow.sm');
-  word-break: break-word;
+    @apply max-w-xl rounded-lg relative shadow-sm break-words px-3 py-2;
 }
 
 .chat-bubble.outgoing {

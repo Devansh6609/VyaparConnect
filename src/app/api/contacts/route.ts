@@ -1,11 +1,11 @@
 // src/app/api/contacts/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getAuthSession } from "../../../lib/auth";
+import { getAuthSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

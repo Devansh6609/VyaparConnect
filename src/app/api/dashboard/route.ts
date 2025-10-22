@@ -9,7 +9,7 @@ import type { PendingPaymentItem } from "../../../types";
 
 export async function GET() {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

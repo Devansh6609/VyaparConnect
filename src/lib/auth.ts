@@ -51,6 +51,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token && session.user) {
+        // This is a more robust way to ensure all custom properties from the token
+        // are correctly added to the session's user object.
         session.user.id = token.id;
         session.user.name = token.name;
         session.user.email = token.email;
@@ -60,26 +62,37 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      // If user object exists, it's the initial sign-in.
-      if (user) {
-        token.id = user.id;
-      } // If token.id is not available, something is wrong, return the token.
+      // The user object is only available on the first call after sign-in.
+      // The `sub` property of the token is the user ID from the provider.
+      const userId = user?.id || token.sub;
 
-      if (!token.id) {
+      if (!userId) {
+        // If there's no user ID, we can't proceed.
         return token;
-      } // On every session access, re-fetch the user data from the DB. // This ensures the session is always fresh, which is crucial for // flows like onboarding where user data changes.
+      }
 
+      // On every session access, re-fetch user data to keep it fresh.
       const dbUser = await prisma.user.findUnique({
-        where: { id: token.id as string },
-        include: { settings: true },
+        where: { id: userId as string },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          hasCompletedOnboarding: true,
+          settings: {
+            select: {
+              primaryWorkflow: true,
+            },
+          },
+        },
       });
 
       if (!dbUser) {
-        // User not found in DB, invalidate the session by returning a modified token
-        token.id = undefined as unknown as string; // FIX: Cast 'undefined' to 'string' to satisfy compiler
-        return token;
-      } // Update the token with the latest data from the database
+        // User not found in DB, invalidate the session.
+        return null;
+      }
 
+      // Update the token with the latest data from the database.
       return {
         ...token, // preserve original token properties like iat, exp
         id: dbUser.id,

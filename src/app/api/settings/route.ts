@@ -7,7 +7,7 @@ import { encrypt } from "@/lib/crypto";
 // GET /api/settings -> fetch settings for the current user
 export async function GET() {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -16,23 +16,16 @@ export async function GET() {
       where: { userId: session.user.id },
     });
 
-    if (!settings) {
-      return NextResponse.json({});
-    }
-
-    // Type assertion is used here to ensure we can safely access and modify keys
-    // which are guaranteed to be present on a non-null settings object.
-    const settingsToReturn: any = { ...settings };
-
+    const settingsToReturn = { ...settings };
     // Never send the actual keys to the client. Send placeholders.
-    if (settingsToReturn.geminiApiKey) {
+    if (settingsToReturn?.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
     }
-    if (settingsToReturn.imgbbApiKey) {
+    if (settingsToReturn?.imgbbApiKey) {
       settingsToReturn.imgbbApiKey = "••••••••••••••••••••••••";
     }
 
-    return NextResponse.json(settingsToReturn);
+    return NextResponse.json(settingsToReturn || {});
   } catch (error) {
     console.error("GET /api/settings error:", error);
     return NextResponse.json(
@@ -45,7 +38,7 @@ export async function GET() {
 // POST /api/settings -> create or update settings for the current user
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;
@@ -102,9 +95,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // Use type assertion here too for consistency in sanitizing the response
-    const settingsToReturn: any = { ...updatedSettings };
-
+    const settingsToReturn = { ...updatedSettings };
     if (settingsToReturn.geminiApiKey) {
       settingsToReturn.geminiApiKey = "••••••••••••••••••••••••••••••••";
     }

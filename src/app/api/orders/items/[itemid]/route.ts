@@ -19,7 +19,7 @@ export async function PUT(
   { params }: { params: { itemId?: string; itemid?: string } }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 

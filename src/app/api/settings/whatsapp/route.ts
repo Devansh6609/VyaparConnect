@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 export async function GET() {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -33,7 +33,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

@@ -6,7 +6,7 @@ import { startOfDay, endOfDay } from "date-fns";
 
 export async function GET(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

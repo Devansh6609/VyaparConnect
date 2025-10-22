@@ -29,7 +29,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 

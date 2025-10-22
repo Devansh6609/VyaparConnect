@@ -6,7 +6,7 @@ import { getAuthSession } from "@/lib/auth";
 // GET all quotations (can be filtered by contactId)
 export async function GET(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 // POST to create a new quotation
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

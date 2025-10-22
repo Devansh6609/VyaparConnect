@@ -31,7 +31,7 @@ async function getUserWhatsAppCredentials(
 
 export async function GET(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -71,7 +71,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

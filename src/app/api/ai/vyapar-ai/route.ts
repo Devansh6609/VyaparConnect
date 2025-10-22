@@ -193,7 +193,7 @@ const randomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)];
 // --- Main Handler ---
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

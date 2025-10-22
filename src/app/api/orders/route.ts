@@ -2,12 +2,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-// import type { Order } from "../../types";
+import type { Order } from "../../../types";
 
 // GET all orders for the logged-in user
 export async function GET(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
 // POST to create a new order
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const userId = session.user.id;

@@ -28,7 +28,7 @@ async function getUserWhatsAppCredentials(
 // GET all broadcasts
 export async function GET() {
   const session = await getAuthSession();
-  if (!session?.user)
+  if (!session?.user?.id)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
@@ -50,7 +50,7 @@ export async function GET() {
 // POST to create and send a new broadcast
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user)
+  if (!session?.user?.id)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const userId = session.user.id;
 

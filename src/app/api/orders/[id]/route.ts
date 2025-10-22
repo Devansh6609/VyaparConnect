@@ -25,7 +25,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -60,7 +60,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -107,7 +107,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 

@@ -67,6 +67,7 @@ function getBillHtml(
               </div>
               <div class="bill-details">
                 <h2>INVOICE</h2>
+                <strong>Bill to:</strong> ${order.customerName}<br/>
                 <strong>Order ID:</strong> #${order.id.substring(0, 6)}<br/>
                 <strong>Date:</strong> ${new Date(
                   order.createdAt
@@ -135,7 +136,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   const session = await getAuthSession();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
