@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { encrypt } from "@/lib/crypto";
+import { randomUUID } from "crypto";
 
 export async function GET() {
   const session = await getAuthSession();
@@ -72,13 +73,14 @@ export async function POST(req: Request) {
       updateData.whatsappAccessToken = encrypt(whatsappAccessToken, userId);
     }
 
-    const existingSettings = await prisma.settings.findUnique({
+    const updatedSettings = await prisma.settings.upsert({
       where: { userId },
-    });
-
-    const updatedSettings = await prisma.settings.update({
-      where: { userId },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId,
+        ...updateData,
+        whatsappVerifyToken: randomUUID(),
+      },
       select: {
         whatsappPhoneNumberId: true,
         whatsappBusinessAccountId: true,

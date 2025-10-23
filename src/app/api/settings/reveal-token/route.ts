@@ -3,12 +3,14 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getAuthSession } from "@/lib/auth";
+import { randomUUID } from "crypto";
 
 export async function POST(req: Request) {
   const session = await getAuthSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const userId = session.user.id;
 
   try {
     const { password } = await req.json();
@@ -34,16 +36,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const settings = await prisma.settings.findUnique({
-      where: { userId: session.user.id },
+    let settings = await prisma.settings.findUnique({
+      where: { userId: userId },
       select: { whatsappVerifyToken: true },
     });
 
-    if (!settings?.whatsappVerifyToken) {
-      return NextResponse.json(
-        { error: "Verification token not found." },
-        { status: 404 }
-      );
+    if (!settings || !settings.whatsappVerifyToken) {
+      const newVerifyToken = randomUUID();
+      await prisma.settings.upsert({
+        where: { userId: userId },
+        update: { whatsappVerifyToken: newVerifyToken },
+        create: { userId: userId, whatsappVerifyToken: newVerifyToken },
+      });
+      return NextResponse.json({ token: newVerifyToken });
     }
 
     return NextResponse.json({ token: settings.whatsappVerifyToken });

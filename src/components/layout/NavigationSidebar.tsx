@@ -115,7 +115,7 @@ const NavigationSidebar: React.FC = () => {
           );
         })}
         <button
-          onClick={() => signOut({ callbackUrl: '/login' })}
+          onClick={() => signOut()}
           className="flex flex-col items-center justify-center w-16 h-16 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400"
           title="Sign Out"
         >

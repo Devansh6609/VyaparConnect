@@ -185,6 +185,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: "not a message or token missing" });
     }
 
+    const decryptedToken = decrypt(
+      settings.whatsappAccessToken,
+      settings.userId
+    );
+
     const msg = value.messages[0];
     const from = msg.from;
     const isGroupMessage = from.endsWith("@g.us");
@@ -202,7 +207,9 @@ export async function POST(req: Request) {
 
     if (!isGroupMessage) {
       const contactName = value.contacts?.[0]?.profile?.name || from;
-      let contact = await prisma.contact.findUnique({ where: { phone: from } });
+      let contact = await prisma.contact.findFirst({
+        where: { phone: from, userId: settings.userId },
+      });
       if (!contact) {
         contact = await prisma.contact.create({
           data: {
@@ -263,12 +270,12 @@ export async function POST(req: Request) {
         );
         const temporaryMediaUrl = await getWhatsAppMediaUrl(
           media.id,
-          settings.whatsappAccessToken!
+          decryptedToken
         );
         if (temporaryMediaUrl) {
           messageData.mediaUrl = await downloadAndUploadMedia(
             temporaryMediaUrl,
-            settings.whatsappAccessToken!,
+            decryptedToken,
             decryptedImgbbKey,
             media.filename
           );
