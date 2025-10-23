@@ -33,11 +33,9 @@ app.prepare().then(() => {
     });
   });
 
-  // Middleware to parse JSON bodies for our emitter endpoint
-  expressApp.use(express.json());
-
-  // Add a dedicated endpoint for API routes to emit socket events
-  expressApp.post("/api/socket/emit", (req, res) => {
+  // Add a dedicated endpoint for API routes to emit socket events.
+  // The express.json() middleware is applied ONLY to this route.
+  expressApp.post("/api/socket/emit", express.json(), (req, res) => {
     const secret = req.headers["x-emitter-secret"];
     const EMITTER_SECRET = process.env.SOCKET_EMITTER_SECRET;
 
