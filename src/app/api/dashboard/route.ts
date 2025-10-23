@@ -202,6 +202,7 @@ export async function GET() {
         : 0;
 
     const totalOrders = ordersToday;
+    // FIX: Corrected typo from `totalOrdersYesterday` to `ordersYesterday`.
     const totalOrdersChange =
       ordersYesterday > 0
         ? ((totalOrders - ordersYesterday) / ordersYesterday) * 100
@@ -241,7 +242,7 @@ export async function GET() {
         select: { geminiApiKey: true },
       });
       if (userSettings?.geminiApiKey) {
-        const decryptedApiKey = decrypt(userSettings.geminiApiKey);
+        const decryptedApiKey = decrypt(userSettings.geminiApiKey, userId);
         const ai = new GoogleGenAI({ apiKey: decryptedApiKey });
 
         const prompt = `

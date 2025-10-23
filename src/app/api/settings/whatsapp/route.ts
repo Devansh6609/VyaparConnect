@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     // Only update the token if a new, non-placeholder value is provided.
     if (whatsappAccessToken && !whatsappAccessToken.startsWith("•")) {
-      updateData.whatsappAccessToken = encrypt(whatsappAccessToken);
+      updateData.whatsappAccessToken = encrypt(whatsappAccessToken, userId);
     }
 
     const createData = {
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       whatsappBusinessAccountId,
       ...(whatsappAccessToken &&
         !whatsappAccessToken.startsWith("•") && {
-          whatsappAccessToken: encrypt(whatsappAccessToken),
+          whatsappAccessToken: encrypt(whatsappAccessToken, userId),
         }),
     };
 

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { decrypt } from "@/lib/crypto";
+import { encrypt } from "@/lib/crypto";
 
 export async function POST(req: Request) {
   const session = await getAuthSession();
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const imgbbApiKey = decrypt(userSettings.imgbbApiKey);
+    const imgbbApiKey = encrypt(userSettings.imgbbApiKey, session.user.id);
 
     const uploadFormData = new FormData();
     uploadFormData.append("image", file);

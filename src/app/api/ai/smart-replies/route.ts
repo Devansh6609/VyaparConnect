@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ replies: [] });
     }
 
-    const decryptedApiKey = decrypt(userSettings.geminiApiKey);
+    const decryptedApiKey = decrypt(userSettings.geminiApiKey, session.user.id);
     const { history } = await req.json();
 
     if (!history) {

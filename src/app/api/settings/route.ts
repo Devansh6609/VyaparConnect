@@ -75,13 +75,13 @@ export async function POST(req: Request) {
 
     // Only update API keys if a new, non-placeholder value is provided.
     if (geminiApiKey && !geminiApiKey.startsWith("•")) {
-      updateData.geminiApiKey = encrypt(geminiApiKey);
+      updateData.geminiApiKey = encrypt(geminiApiKey, userId);
     } else if (geminiApiKey === "") {
       updateData.geminiApiKey = null;
     }
 
     if (imgbbApiKey && !imgbbApiKey.startsWith("•")) {
-      updateData.imgbbApiKey = encrypt(imgbbApiKey);
+      updateData.imgbbApiKey = encrypt(imgbbApiKey, userId);
     } else if (imgbbApiKey === "") {
       updateData.imgbbApiKey = null;
     }

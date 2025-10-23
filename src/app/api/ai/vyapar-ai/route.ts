@@ -211,7 +211,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const decryptedApiKey = decrypt(userSettings.geminiApiKey);
+    const decryptedApiKey = decrypt(userSettings.geminiApiKey, userId);
     const { history } = (await req.json()) as { history: AIMessage[] };
 
     if (!history || history.length === 0) {

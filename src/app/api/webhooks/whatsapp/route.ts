@@ -246,7 +246,10 @@ export async function POST(req: Request) {
       filename?: string;
     }) => {
       if (media.id && settings.imgbbApiKey) {
-        const decryptedImgbbKey = decrypt(settings.imgbbApiKey);
+        const decryptedImgbbKey = decrypt(
+          settings.imgbbApiKey,
+          settings.userId
+        );
         const temporaryMediaUrl = await getWhatsAppMediaUrl(
           media.id,
           settings.whatsappAccessToken!

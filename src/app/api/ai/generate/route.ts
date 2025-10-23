@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     // Decrypt the key on the server
-    const decryptedApiKey = decrypt(userSettings.geminiApiKey);
+    const decryptedApiKey = decrypt(userSettings.geminiApiKey, session.user.id);
 
     const { command, history } = await req.json();
 

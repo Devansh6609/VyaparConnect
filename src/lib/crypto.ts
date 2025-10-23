@@ -1,26 +1,31 @@
 // src/lib/crypto.ts
-import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  pbkdf2Sync,
+} from "crypto";
+import { Buffer } from "node:buffer";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 16;
 const AUTH_TAG_LENGTH = 16;
+// This static salt is used to derive a key. It's not a secret itself.
+const SALT = "a-static-salt-for-vyaparconnect-app";
 
-// The ENCRYPTION_KEY environment variable must be a 64-character hex string (32 bytes).
-// It can be generated with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-const KEY = Buffer.from(process.env.ENCRYPTION_KEY || "", "hex");
-
-function validateKey() {
-  if (KEY.length !== 32) {
-    throw new Error(
-      "Invalid ENCRYPTION_KEY environment variable. It must be a 64-character hex string."
-    );
+function getKey(userId: string): Buffer {
+  if (!userId) {
+    throw new Error("A user ID must be provided for cryptographic operations.");
   }
+  // Derive a 32-byte (256-bit) key from the user ID and a static salt.
+  // This is more secure than using the ID directly and avoids needing an environment variable.
+  return pbkdf2Sync(userId, SALT, 100000, 32, "sha512");
 }
 
-export function encrypt(text: string): string {
-  validateKey();
+export function encrypt(text: string, userId: string): string {
+  const key = getKey(userId);
   const iv = randomBytes(IV_LENGTH);
-  const cipher = createCipheriv(ALGORITHM, KEY, iv);
+  const cipher = createCipheriv(ALGORITHM, key, iv);
   const encrypted = Buffer.concat([
     cipher.update(text, "utf8"),
     cipher.final(),
@@ -32,8 +37,8 @@ export function encrypt(text: string): string {
   )}`;
 }
 
-export function decrypt(encryptedText: string): string {
-  validateKey();
+export function decrypt(encryptedText: string, userId: string): string {
+  const key = getKey(userId);
   const parts = encryptedText.split(":");
   if (parts.length !== 3) {
     throw new Error("Invalid encrypted text format.");
@@ -43,7 +48,7 @@ export function decrypt(encryptedText: string): string {
   const authTag = Buffer.from(parts[1], "hex");
   const encrypted = Buffer.from(parts[2], "hex");
 
-  const decipher = createDecipheriv(ALGORITHM, KEY, iv);
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
   decipher.setAuthTag(authTag);
 
   const decrypted = Buffer.concat([
