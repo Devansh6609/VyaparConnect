@@ -1,6 +1,8 @@
+// src/app/api/auth/register/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -27,12 +29,25 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      });
+
+      // Automatically create a settings entry with a secure verify token
+      await tx.settings.create({
+        data: {
+          userId: newUser.id,
+          whatsappVerifyToken: randomUUID(),
+          primaryWorkflow: "HYBRID", // Sensible default
+        },
+      });
+
+      return newUser;
     });
 
     // Exclude password from the returned object

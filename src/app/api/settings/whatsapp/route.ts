@@ -16,14 +16,19 @@ export async function GET() {
         whatsappPhoneNumberId: true,
         whatsappBusinessAccountId: true,
         whatsappAccessToken: true,
+        whatsappVerifyToken: true,
       },
     });
 
-    const settingsToReturn = { ...settings };
+    const settingsToReturn: any = { ...settings };
     // Never send the actual token to the client. Send a placeholder.
     if (settingsToReturn?.whatsappAccessToken) {
       settingsToReturn.whatsappAccessToken = "••••••••••••••••••••••••••••••••";
     }
+
+    // Instead of the token, return a boolean indicating if it exists
+    settingsToReturn.hasVerifyToken = !!settings?.whatsappVerifyToken;
+    delete settingsToReturn.whatsappVerifyToken;
 
     return NextResponse.json(settingsToReturn || {});
   } catch (error) {
@@ -67,31 +72,27 @@ export async function POST(req: Request) {
       updateData.whatsappAccessToken = encrypt(whatsappAccessToken, userId);
     }
 
-    const createData = {
-      userId,
-      whatsappPhoneNumberId,
-      whatsappBusinessAccountId,
-      ...(whatsappAccessToken &&
-        !whatsappAccessToken.startsWith("•") && {
-          whatsappAccessToken: encrypt(whatsappAccessToken, userId),
-        }),
-    };
-
-    const updatedSettings = await prisma.settings.upsert({
+    const existingSettings = await prisma.settings.findUnique({
       where: { userId },
-      update: updateData,
-      create: createData,
+    });
+
+    const updatedSettings = await prisma.settings.update({
+      where: { userId },
+      data: updateData,
       select: {
         whatsappPhoneNumberId: true,
         whatsappBusinessAccountId: true,
         whatsappAccessToken: true,
+        whatsappVerifyToken: true,
       },
     });
 
-    const settingsToReturn = { ...updatedSettings };
+    const settingsToReturn: any = { ...updatedSettings };
     if (settingsToReturn.whatsappAccessToken) {
       settingsToReturn.whatsappAccessToken = "••••••••••••••••••••••••••••••••";
     }
+    settingsToReturn.hasVerifyToken = !!updatedSettings.whatsappVerifyToken;
+    delete settingsToReturn.whatsappVerifyToken;
 
     return NextResponse.json(settingsToReturn);
   } catch (error) {

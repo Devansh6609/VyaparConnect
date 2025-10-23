@@ -83,29 +83,40 @@ export async function GET(req: NextRequest) {
   const mode = searchParams.get("hub.mode");
   const token = searchParams.get("hub.verify_token");
   const challenge = searchParams.get("hub.challenge");
+  const uid = searchParams.get("uid"); // User ID from query param
 
-  // Use a global verify token from environment variables
-  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
-
-  // It's crucial to have this token set in your environment.
-  if (!verifyToken) {
+  if (!uid) {
     console.error(
-      "❌ FATAL: WHATSAPP_VERIFY_TOKEN is not set in environment variables. Webhook verification will fail."
+      "❌ WhatsApp Webhook Verification Failed: Missing user ID (uid) in callback URL."
+    );
+    return new NextResponse("Forbidden: Missing user identifier", {
+      status: 403,
+    });
+  }
+
+  try {
+    const settings = await prisma.settings.findUnique({
+      where: { userId: uid },
+      select: { whatsappVerifyToken: true },
+    });
+
+    if (
+      mode === "subscribe" &&
+      settings &&
+      token === settings.whatsappVerifyToken
+    ) {
+      console.log(`✅ WhatsApp Webhook Verified for user ${uid}.`);
+      return new NextResponse(challenge ?? "", { status: 200 });
+    }
+
+    console.error(
+      `❌ WhatsApp Webhook Verification Failed for user ${uid}. Token mismatch or user not found.`
     );
     return new NextResponse("Forbidden", { status: 403 });
+  } catch (error) {
+    console.error(`Error during webhook verification for user ${uid}:`, error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
-
-  if (mode === "subscribe" && token === verifyToken) {
-    console.log(
-      "✅ WhatsApp Webhook Verified successfully using global token."
-    );
-    return new NextResponse(challenge ?? "", { status: 200 });
-  }
-
-  console.error(
-    "❌ WhatsApp Webhook Verification Failed. The token received did not match the expected token."
-  );
-  return new NextResponse("Forbidden", { status: 403 });
 }
 
 // Handle incoming messages and status updates
