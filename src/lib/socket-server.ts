@@ -3,10 +3,10 @@
 // (standalone for dev, integrated for prod).
 export async function emitSocketEvent(event: string, data: any) {
   try {
-    // The emitter needs an absolute URL to post back to the server.
-    // This will be http://localhost:3000 in dev and your Render URL in production.
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const url = `${baseUrl}/api/socket/emit`;
+    // For server-to-server communication within the same container, localhost is correct.
+    // We must use the PORT the server is actually listening on, which is provided by the environment.
+    const port = process.env.PORT || "3000";
+    const url = `http://localhost:${port}/api/socket/emit`;
     const EMITTER_SECRET = process.env.SOCKET_EMITTER_SECRET;
 
     if (!EMITTER_SECRET) {
