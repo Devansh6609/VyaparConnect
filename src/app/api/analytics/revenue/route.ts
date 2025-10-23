@@ -2,7 +2,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import { startOfDay, endOfDay } from "date-fns";
+
+// FIX: Manual implementation of date-fns functions to avoid module resolution errors.
+const startOfDay = (date: Date): Date => {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
+};
+
+const endOfDay = (date: Date): Date => {
+  const newDate = new Date(date);
+  newDate.setHours(23, 59, 59, 999);
+  return newDate;
+};
 
 export async function GET(req: Request) {
   const session = await getAuthSession();

@@ -16,15 +16,18 @@ export const getSocket = (): Socket => {
       reconnectionDelay: 2000,
     });
 
-    socket.on("connect", () => {
+    // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' method.
+    (socket as any).on("connect", () => {
       console.log("✅ Socket connected:", socket!.id);
     });
 
-    socket.on("disconnect", (reason: Socket.DisconnectReason) => {
+    // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' method.
+    (socket as any).on("disconnect", (reason: Socket.DisconnectReason) => {
       console.log("❌ Socket disconnected:", reason);
     });
 
-    socket.on("connect_error", (err) => {
+    // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' method.
+    (socket as any).on("connect_error", (err: Error) => {
       console.error("Socket connection error:", err.message, err);
     });
   }

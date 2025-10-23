@@ -11,15 +11,36 @@ import { getAuthSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/crypto";
 import { arrayToCsv } from "@/lib/csv";
-import {
-  startOfMonth,
-  endOfMonth,
-  subDays,
-  startOfDay,
-  subMonths,
-  startOfYear,
-  endOfYear,
-} from "date-fns";
+// FIX: Removed date-fns imports and added manual implementations below to fix module resolution errors.
+
+// FIX: Manual implementations of date-fns functions to avoid module resolution errors.
+const startOfDay = (date: Date): Date => {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
+};
+const subDays = (date: Date, amount: number): Date => {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() - amount);
+  return newDate;
+};
+const startOfMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+};
+const endOfMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+};
+const subMonths = (date: Date, amount: number): Date => {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() - amount);
+  return newDate;
+};
+const startOfYear = (date: Date): Date => {
+  return new Date(date.getFullYear(), 0, 1);
+};
+const endOfYear = (date: Date): Date => {
+  return new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
+};
 
 // --- Function Declarations for Gemini ---
 
@@ -390,7 +411,10 @@ export async function POST(req: Request) {
           if (timePeriod === "last_month") {
             const lastMonth = subMonths(now, 1);
             gte = startOfMonth(lastMonth);
-            whereClause.createdAt.lte = endOfMonth(lastMonth);
+            whereClause.createdAt = {
+              ...whereClause.createdAt,
+              lte: endOfMonth(lastMonth),
+            };
           }
           if (timePeriod === "this_year") gte = startOfYear(now);
           if (gte) whereClause.createdAt = { gte };

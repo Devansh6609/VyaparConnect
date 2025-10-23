@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React from "react";
@@ -7,7 +8,7 @@ import ChatList from "./ChatList";
 import ChatView from "./ChatView";
 // FIX: Used type-only import to prevent module resolution errors.
 import type { Contact, Message } from "../types";
-import { Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
 interface ChatModuleProps {
     socket: Socket | null;
@@ -21,6 +22,7 @@ interface ChatModuleProps {
     initialMessage?: string | null;
     initialCursor?: string | null;
     onCreateOrder: () => void;
+    onShowPanel: () => void; // For mobile
 }
 
 const ChatModule: React.FC<ChatModuleProps> = ({
@@ -35,15 +37,18 @@ const ChatModule: React.FC<ChatModuleProps> = ({
     initialMessage,
     initialCursor,
     onCreateOrder,
+    onShowPanel,
 }) => {
     return (
         <div className="flex h-full bg-white overflow-hidden">
-            <ChatList
-                socket={socket}
-                activeContactId={activeContact?.id || null}
-                onSelectChat={onSelectContact}
-            />
-            <div className="flex-1 flex flex-col min-w-0">
+            <div className={`${activeContact ? 'hidden' : 'flex'} w-full md:flex md:w-auto flex-col`}>
+                <ChatList
+                    socket={socket}
+                    activeContactId={activeContact?.id || null}
+                    onSelectChat={onSelectContact}
+                />
+            </div>
+            <div className={`${activeContact ? 'flex' : 'hidden'} flex-1 md:flex flex-col min-w-0`}>
                 <ChatView
                     chat={activeContact}
                     onPromoteCustomer={onPromoteCustomer}
@@ -52,6 +57,8 @@ const ChatModule: React.FC<ChatModuleProps> = ({
                     initialMessage={initialMessage}
                     initialNextCursor={initialCursor}
                     onCreateOrder={onCreateOrder}
+                    onBack={() => onSelectContact(null!)}
+                    onShowPanel={onShowPanel}
                 />
             </div>
         </div>

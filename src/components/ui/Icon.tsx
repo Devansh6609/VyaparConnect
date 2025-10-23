@@ -5,6 +5,7 @@ import {
   // List all icons used in the app to ensure they are bundled.
   Activity,
   AlertCircle,
+  ArrowLeft, // Added ArrowLeft icon
   BarChart3,
   Check,
   CheckCheck,
@@ -18,6 +19,7 @@ import {
   FileText,
   Filter,
   Image, // Added Image icon
+  Info, // Added Info icon
   LayoutDashboard,
   LineChart,
   Lock,
@@ -43,6 +45,7 @@ import {
 const iconMap = {
   activity: Activity,
   alertCircle: AlertCircle,
+  arrowLeft: ArrowLeft, // Added ArrowLeft icon
   barChart3: BarChart3,
   check: Check,
   checkCheck: CheckCheck,
@@ -56,6 +59,7 @@ const iconMap = {
   fileText: FileText,
   filter: Filter,
   image: Image, // Added Image icon
+  info: Info, // Added Info icon
   layoutDashboard: LayoutDashboard,
   lineChart: LineChart,
   lock: Lock,

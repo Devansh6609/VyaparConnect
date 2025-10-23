@@ -8,7 +8,8 @@ import LineChart from './charts/LineChart';
 import PieChart from './charts/PieChart';
 import type { SalesFunnelProps } from './SalesFunnel';
 import { CalendarDays, Loader2 } from 'lucide-react';
-import { startOfDay, endOfDay, subDays, startOfMonth, format } from 'date-fns';
+// FIX: Replaced failing date-fns imports with manual implementations below to fix module resolution errors.
+import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
@@ -30,6 +31,23 @@ interface AnalyticsChartProps {
 type AnalysisType = 'revenue' | 'funnel';
 type ChartType = 'bar' | 'line' | 'pie';
 type DateFilterPreset = 'today' | '7d' | '30d' | 'custom';
+
+// FIX: Manual implementation of date-fns functions to avoid module resolution errors.
+const startOfDay = (date: Date): Date => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+};
+const endOfDay = (date: Date): Date => {
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    return newDate;
+};
+const subDays = (date: Date, amount: number): Date => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() - amount);
+    return newDate;
+};
 
 
 const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ revenueData, funnelData }) => {

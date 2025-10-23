@@ -8,14 +8,13 @@ import RightPanel from "@/components/RightPanel";
 // FIX: Used type-only import to prevent module resolution errors.
 import type { Contact, Product, Message } from "../../types";
 import { getSocket } from "@/lib/socket-client";
-import { Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import ChatPageSkeleton from "@/components/skeletons/ChatPageSkeleton";
 
 function ChatPageContent() {
     const searchParams = useSearchParams();
-    // FIX: Add optional chaining (?) to safely access methods on searchParams.
-    const contactIdFromUrl = searchParams?.get('contactId');
-    const messageFromUrl = searchParams?.get('message');
+    const contactIdFromUrl = searchParams.get('contactId');
+    const messageFromUrl = searchParams.get('message');
 
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [activeContact, setActiveContact] = useState<Contact | null>(null);
@@ -26,6 +25,7 @@ function ChatPageContent() {
 
     const [rightPanelKey, setRightPanelKey] = useState(0);
     const [initialRightPanelView, setInitialRightPanelView] = useState("main_menu");
+    const [isPanelVisible, setPanelVisible] = useState(false);
 
     // State for AI-driven order creation workflow
     const [awaitingAddressResponseForOrder, setAwaitingAddressResponseForOrder] = useState(false);
@@ -131,16 +131,18 @@ function ChatPageContent() {
             }
         };
 
-        socket.on("newMessage", handleNewMessage);
-        socket.on("message-status-update", handleStatusUpdate);
-        socket.on("deleteMessage", handleDeleteMessage);
-        socket.on("contact_updated", handleContactUpdate);
+        // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' method.
+        (socket as any).on("newMessage", handleNewMessage);
+        (socket as any).on("message-status-update", handleStatusUpdate);
+        (socket as any).on("deleteMessage", handleDeleteMessage);
+        (socket as any).on("contact_updated", handleContactUpdate);
 
         return () => {
-            socket.off("newMessage", handleNewMessage);
-            socket.off("message-status-update", handleStatusUpdate);
-            socket.off("deleteMessage", handleDeleteMessage);
-            socket.off("contact_updated", handleContactUpdate);
+            // FIX: Cast socket to 'any' to resolve TypeScript error for 'off' method.
+            (socket as any).off("newMessage", handleNewMessage);
+            (socket as any).off("message-status-update", handleStatusUpdate);
+            (socket as any).off("deleteMessage", handleDeleteMessage);
+            (socket as any).off("contact_updated", handleContactUpdate);
         };
     }, [socket, activeContact, awaitingAddressResponseForOrder]);
 
@@ -163,6 +165,8 @@ function ChatPageContent() {
             setMessages([]);
             setInitialCursor(null);
         }
+        // When contact changes, hide the side panel on mobile.
+        setPanelVisible(false);
     }, [activeContact?.id]);
 
     const handleShareProduct = async (product: Product) => {
@@ -170,7 +174,7 @@ function ChatPageContent() {
         setMessages(prev => [...prev, {
             id: `temp-${Date.now()}`, from: 'business', to: activeContact.phone, type: 'product',
             text: `Sharing ${product.name}...`, createdAt: new Date().toISOString(), contactId: activeContact.id, status: 'pending', product
-        } as Message]); // Cast to Message
+        }]);
         await fetch("/api/messages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -179,7 +183,7 @@ function ChatPageContent() {
     };
 
     const handleSelectContact = (contact: Contact) => {
-        if (activeContact?.id !== contact.id) {
+        if (activeContact?.id !== contact?.id) {
             setActiveContact(contact);
             setInitialRightPanelView("main_menu");
             setRightPanelKey((prev) => prev + 1);
@@ -193,6 +197,7 @@ function ChatPageContent() {
         setNewAddressForOrder(null);
         setInitialRightPanelView("new_order");
         setRightPanelKey(prev => prev + 1);
+        setPanelVisible(true); // Open right panel on mobile
 
         let messageText = '';
         if (activeContact.lastShippingAddress) {
@@ -212,7 +217,7 @@ function ChatPageContent() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <div className="transition-all duration-300 ease-in-out flex-1">
+            <div className={`flex-1 ${isPanelVisible ? 'hidden' : 'flex'} md:flex flex-col`}>
                 <ChatModule
                     socket={socket}
                     contacts={contacts}
@@ -222,24 +227,29 @@ function ChatPageContent() {
                     onPromoteCustomer={() => {
                         setInitialRightPanelView("master_customer_details");
                         setRightPanelKey(prev => prev + 1);
+                        setPanelVisible(true);
                     }}
                     messages={messages}
                     setMessages={setMessages}
                     initialMessage={initialMessage}
                     initialCursor={initialCursor}
                     onCreateOrder={handleCreateOrderTrigger}
+                    onShowPanel={() => setPanelVisible(true)}
                 />
             </div>
             {activeContact && (
-                <RightPanel
-                    key={rightPanelKey}
-                    activeContact={activeContact}
-                    messages={messages}
-                    onShareProduct={handleShareProduct}
-                    initialViewId={initialRightPanelView as any}
-                    socket={socket}
-                    newAddressForOrder={newAddressForOrder}
-                />
+                <div className={`${isPanelVisible ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
+                    <RightPanel
+                        key={rightPanelKey}
+                        activeContact={activeContact}
+                        messages={messages}
+                        onShareProduct={handleShareProduct}
+                        initialViewId={initialRightPanelView as any}
+                        socket={socket}
+                        newAddressForOrder={newAddressForOrder}
+                        onClosePanel={() => setPanelVisible(false)}
+                    />
+                </div>
             )}
         </div>
     );
@@ -248,7 +258,6 @@ function ChatPageContent() {
 
 export default function ChatPage() {
     return (
-        // The Suspense boundary ensures useSearchParams is ready
         <Suspense fallback={<ChatPageSkeleton />}>
             <ChatPageContent />
         </Suspense>

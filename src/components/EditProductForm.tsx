@@ -15,8 +15,8 @@ interface EditProductFormProps {
         id: string;
         name: string;
         price: number;
-        description?: string;
-        category?: string;
+        description?: string | null;
+        category?: string | null;
         inStock?: boolean;
         stockQuantity?: number;
         images?: ProductImage[];

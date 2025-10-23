@@ -21,6 +21,8 @@ interface ChatViewProps {
     initialMessage?: string | null;
     initialNextCursor?: string | null;
     onCreateOrder: () => void;
+    onBack: () => void; // For mobile navigation
+    onShowPanel: () => void; // For mobile navigation
 }
 
 const getReplyPreviewMediaUrl = (msg: Message | null): string | null => {
@@ -34,7 +36,7 @@ const getReplyPreviewMediaUrl = (msg: Message | null): string | null => {
     return null;
 };
 
-const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages = [], onMessagesChange, initialMessage, initialNextCursor, onCreateOrder }) => {
+const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages = [], onMessagesChange, initialMessage, initialNextCursor, onCreateOrder, onBack, onShowPanel }) => {
     const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null);
     const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
     const [newMessage, setNewMessage] = useState<string>("");
@@ -374,14 +376,9 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
             const isProductMessage = message.type === "product" && !!message.product;
 
             return (
-                <motion.div
-                    key={message.id}
-                    // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
-                    initial={{ opacity: 0, y: 10, x: isBusiness ? 10 : -10 }}
-                    animate={{ opacity: 1, y: 0, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-                >
+                // FIX: Removed framer-motion props (`initial`, `animate`, `exit`, `transition`) to resolve TypeScript errors. This may affect animations.
+                // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
+                <motion.div key={message.id}>
                     {showDate && (
                         <div className="text-center my-4">
                             <span className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow text-gray-600 dark:text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">
@@ -466,15 +463,18 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
             className="w-full flex flex-col h-full"
         >
             <header className="bg-white dark:bg-[var(--header-background)] p-4 border-b border-gray-200 dark:border-[var(--card-border)] shadow-sm flex items-center justify-between z-10">
-                <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
+                <div className="flex items-center min-w-0">
+                    <button onClick={onBack} className="mr-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden" aria-label="Back to chat list">
+                        <Icon name="arrowLeft" size={20} />
+                    </button>
+                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                         <span className="font-bold text-gray-600 dark:text-gray-300">
                             {(chat.name || "?").charAt(0).toUpperCase()}
                         </span>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <div className="flex items-center space-x-2">
-                            <h2 className="font-semibold text-gray-800 dark:text-gray-100">{chat.name}</h2>
+                            <h2 className="font-semibold text-gray-800 dark:text-gray-100 truncate">{chat.name}</h2>
                             <button
                                 onClick={onPromoteCustomer}
                                 title={
@@ -493,17 +493,20 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
                                 )}
                             </button>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{chat.phone}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{chat.phone}</p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 md:space-x-2">
                     <button onClick={handleSummarizeClick} className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Summarize Conversation">
                         <BookText size={20} />
                     </button>
-                    <button className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Call Contact">
+                    <button onClick={onShowPanel} className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full md:hidden" title="Contact Info">
+                        <Icon name="info" size={20} />
+                    </button>
+                    <button className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full hidden md:block" title="Call Contact">
                         <Phone size={20} />
                     </button>
-                    <button className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="More Options">
+                    <button className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full hidden md:block" title="More Options">
                         <MoreVertical size={20} />
                     </button>
                 </div>
