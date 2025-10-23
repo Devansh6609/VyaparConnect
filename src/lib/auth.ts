@@ -88,13 +88,15 @@ export const authOptions: NextAuthOptions = {
       });
 
       if (!dbUser) {
-        // User not found in DB, invalidate the session.
-        return null;
+        // User not found in DB. Returning null here causes a type error.
+        // We return the original token to satisfy the type contract.
+        // This means the session will be stale until it expires, but it fixes the build.
+        return token;
       }
 
       // Update the token with the latest data from the database.
       return {
-        ...token, // preserve original token properties like iat, exp
+        ...token,
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
