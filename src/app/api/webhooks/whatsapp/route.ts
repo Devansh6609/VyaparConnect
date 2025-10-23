@@ -34,7 +34,7 @@ async function downloadAndUploadMedia(
   mediaUrl: string,
   token: string,
   imgbbApiKey: string,
-  fileName: string = "image.jpg"
+  fileName?: string | null
 ): Promise<string | null> {
   if (!imgbbApiKey) {
     console.error("User-specific ImgBB API key is missing.");
@@ -45,14 +45,25 @@ async function downloadAndUploadMedia(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!downloadResponse.ok) {
-      console.error("Failed to download media from WhatsApp.");
+      console.error(
+        "Failed to download media from WhatsApp.",
+        await downloadResponse.text()
+      );
       return null;
     }
     const fileBuffer = await downloadResponse.arrayBuffer();
-    const file = new Blob([fileBuffer]);
+    const contentType =
+      downloadResponse.headers.get("Content-Type") ||
+      "application/octet-stream";
+
+    const file = new Blob([fileBuffer], { type: contentType });
 
     const formData = new FormData();
-    formData.append("image", file, fileName);
+    // Construct a file name with extension. e.g., 'image.jpeg'
+    const extension = contentType.split("/")[1] || "bin";
+    const uploadFileName = fileName || `media.${extension}`;
+
+    formData.append("image", file, uploadFileName);
 
     const uploadResponse = await fetch(
       `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
@@ -261,7 +272,7 @@ export async function POST(req: Request) {
     const handleMedia = async (media: {
       id: string;
       caption?: string;
-      filename?: string;
+      filename?: string | null;
     }) => {
       if (media.id && settings.imgbbApiKey) {
         const decryptedImgbbKey = decrypt(
@@ -283,6 +294,14 @@ export async function POST(req: Request) {
       }
       messageData.text = media.caption || "";
       messageData.fileName = media.filename;
+
+      // If media processing failed, don't save it as a media message type
+      if (!messageData.mediaUrl) {
+        // Append a user-facing error message to the caption
+        const originalText = messageData.text ? `${messageData.text}\n\n` : "";
+        messageData.text = `${originalText}[System: Failed to process attached media. Please check your media hosting (ImgBB) API key in settings.]`;
+        messageData.type = "text"; // Fallback to text message
+      }
     };
 
     switch (msg.type) {
@@ -290,7 +309,11 @@ export async function POST(req: Request) {
         messageData.text = msg.text.body;
         break;
       case "image":
-        await handleMedia({ id: msg.image?.id, caption: msg.image?.caption });
+        await handleMedia({
+          id: msg.image?.id,
+          caption: msg.image?.caption,
+          filename: null,
+        });
         break;
       case "document":
         await handleMedia({
