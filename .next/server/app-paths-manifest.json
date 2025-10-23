@@ -1,19 +1,7 @@
 {
   "/page": "app/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/dashboard/route": "app/api/dashboard/route.js",
-  "/chat/page": "app/chat/page.js",
-  "/api/contacts/route": "app/api/contacts/route.js",
-  "/api/tags/route": "app/api/tags/route.js",
-  "/api/messages/route": "app/api/messages/route.js",
-  "/api/contacts/[id]/reset-unread/route": "app/api/contacts/[id]/reset-unread/route.js",
-  "/api/ai/smart-replies/route": "app/api/ai/smart-replies/route.js",
-  "/orders/page": "app/orders/page.js",
-  "/api/orders/route": "app/api/orders/route.js",
-  "/broadcasts/page": "app/broadcasts/page.js",
-  "/api/broadcasts/route": "app/api/broadcasts/route.js",
-  "/groups/page": "app/groups/page.js",
-  "/api/groups/route": "app/api/groups/route.js",
   "/settings/page": "app/settings/page.js",
-  "/api/settings/route": "app/api/settings/route.js"
+  "/settings/whatsapp/page": "app/settings/whatsapp/page.js",
+  "/api/settings/whatsapp/route": "app/api/settings/whatsapp/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js"
 }

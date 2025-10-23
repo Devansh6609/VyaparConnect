@@ -1,4 +1,14 @@
+const fs = require('fs');
+const path = require('path');
+
+// Load .env.local first if it exists, which is common in Next.js projects.
+// .env will be loaded afterwards, but variables from .env.local will take precedence as they are set first.
+const localEnvPath = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(localEnvPath)) {
+  require('dotenv').config({ path: localEnvPath });
+}
 require("dotenv").config();
+
 
 const { createServer } = require("http");
 const express = require("express");
@@ -10,6 +20,7 @@ const EMITTER_SECRET = process.env.SOCKET_EMITTER_SECRET;
 
 if (!EMITTER_SECRET) {
     console.error("FATAL: SOCKET_EMITTER_SECRET is not set. The server will not be able to receive events from the backend.");
+    console.error("Please create a .env or .env.local file and add SOCKET_EMITTER_SECRET=<your_secret_key>");
     process.exit(1);
 }
 

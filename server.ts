@@ -1,5 +1,5 @@
 // server.ts
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer } from "http";
 import { parse } from "url";
 import next from "next";
 import express from "express";
@@ -25,10 +25,36 @@ app.prepare().then(() => {
     },
   });
 
-  // Middleware to make the io instance available to API routes
-  expressApp.use((req: any, res, next) => {
-    req.io = io;
-    next();
+  // Add connection logging for debugging
+  io.on("connection", (socket) => {
+    console.log("✅ Socket client connected:", socket.id);
+    socket.on("disconnect", () => {
+      console.log("❌ Socket client disconnected:", socket.id);
+    });
+  });
+
+  // Middleware to parse JSON bodies for our emitter endpoint
+  expressApp.use(express.json());
+
+  // Add a dedicated endpoint for API routes to emit socket events
+  expressApp.post("/api/socket/emit", (req, res) => {
+    const secret = req.headers["x-emitter-secret"];
+    const EMITTER_SECRET = process.env.SOCKET_EMITTER_SECRET;
+
+    if (!EMITTER_SECRET || secret !== EMITTER_SECRET) {
+      console.warn("Received /api/socket/emit request with invalid secret.");
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { event, data } = req.body;
+    if (event && data) {
+      io.emit(event, data);
+      res.status(200).json({ success: true, message: "Event emitted." });
+    } else {
+      res
+        .status(400)
+        .json({ success: false, message: "Missing event or data." });
+    }
   });
 
   // Handle all other requests with Next.js

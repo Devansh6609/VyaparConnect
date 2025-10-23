@@ -7,8 +7,10 @@ let socket: Socket | null = null;
 // Frontend socket (client)
 export const getSocket = (): Socket => {
   if (!socket) {
-    // Connect to the same host that serves the page
+    // When no URL is provided, it defaults to the current host.
+    // This works for both local dev (localhost:3000) and production on Render.
     socket = io({
+      path: "/socket.io", // Must match the path on the server
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 2000,
@@ -20,6 +22,10 @@ export const getSocket = (): Socket => {
 
     socket.on("disconnect", (reason: Socket.DisconnectReason) => {
       console.log("❌ Socket disconnected:", reason);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err.message, err);
     });
   }
 

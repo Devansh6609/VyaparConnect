@@ -108,12 +108,7 @@ body {
 
 /* Chat Bubble Styles */
 .chat-bubble {
-<<<<<<< HEAD
     @apply max-w-xl rounded-lg relative shadow-sm break-words px-3 py-2;
-=======
-  /* CRITICAL FIX: Removed @apply directives that were causing build failure. 
-     The classes must be applied directly in the JSX. */
->>>>>>> 2c7c28694180ce36c4447fa1db23590313b8ac6e
 }
 
 .chat-bubble.outgoing {

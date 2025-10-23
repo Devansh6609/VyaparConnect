@@ -11,7 +11,6 @@ interface WhatsAppSettings {
     whatsappPhoneNumberId?: string;
     whatsappBusinessAccountId?: string;
     whatsappAccessToken?: string;
-    whatsappVerifyToken?: string;
 }
 
 // FIX: Removed animation props due to framer-motion type errors.
@@ -27,9 +26,13 @@ const WhatsAppSettingsPage = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [webhookUrl, setWebhookUrl] = useState('');
+    const [generatedToken, setGeneratedToken] = useState('');
+    const [isLocalhost, setIsLocalhost] = useState(false);
 
     useEffect(() => {
-        setWebhookUrl(`${window.location.origin}/api/webhooks/whatsapp`);
+        const origin = window.location.origin;
+        setWebhookUrl(`${origin}/api/webhooks/whatsapp`);
+        setIsLocalhost(origin.includes('localhost') || origin.includes('127.0.0.1'));
 
         const fetchSettings = async () => {
             setLoading(true);
@@ -82,6 +85,11 @@ const WhatsAppSettingsPage = () => {
         // Add a small visual feedback if you want
     };
 
+    const generateToken = () => {
+        // crypto.randomUUID() is secure and available in modern browsers (and secure contexts)
+        setGeneratedToken(crypto.randomUUID());
+    };
+
     if (loading) {
         return <div className="p-8 flex items-center justify-center h-full"><LoadingSpinner /></div>;
     }
@@ -124,7 +132,19 @@ const WhatsAppSettingsPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Permanent Access Token</label>
-                            <input type="password" name="whatsappAccessToken" value={settings.whatsappAccessToken || ''} onChange={handleInputChange} className="w-full border rounded-md p-2 mt-1 dark:bg-gray-700 dark:border-gray-600" required />
+                            <input
+                                type="password"
+                                name="whatsappAccessToken"
+                                value={settings.whatsappAccessToken || ''}
+                                onChange={handleInputChange}
+                                onFocus={(e) => {
+                                    if (e.target.value.startsWith('•')) {
+                                        setSettings(prev => ({ ...prev, whatsappAccessToken: '' }));
+                                    }
+                                }}
+                                placeholder="Enter a new token to update it"
+                                className="w-full border rounded-md p-2 mt-1 dark:bg-gray-700 dark:border-gray-600"
+                            />
                         </div>
                         <div className="flex justify-end pt-2">
                             <button type="submit" disabled={saving} className="flex items-center justify-center px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50">
@@ -146,14 +166,50 @@ const WhatsAppSettingsPage = () => {
                             <label className="block text-sm font-medium">Callback URL</label>
                             <div className="flex items-center mt-1">
                                 <input type="text" value={webhookUrl} readOnly className="w-full border rounded-l-md p-2 bg-gray-100 dark:bg-gray-700/50 font-mono text-xs" />
-                                <button onClick={() => copyToClipboard(webhookUrl)} className="p-2 border border-l-0 rounded-r-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500"><Copy size={16} /></button>
+                                <button type="button" onClick={() => copyToClipboard(webhookUrl)} className="p-2 border border-l-0 rounded-r-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500"><Copy size={16} /></button>
                             </div>
+                            {isLocalhost ? (
+                                <div className="mt-2 p-3 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 rounded-md text-sm flex items-start">
+                                    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
+                                    <span>
+                                        <strong>Action Required:</strong> You are on a local server. Meta's webhooks cannot reach this URL. You must use a tunneling service like <a href="https://ngrok.com/" target="_blank" rel="noopener noreferrer" className="font-bold underline">ngrok</a> to get a public HTTPS URL. Then, paste that public URL (e.g., <code>https://&lt;your-ngrok-id&gt;.ngrok.io/api/webhooks/whatsapp</code>) into your Meta App's webhook configuration.
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="mt-2 p-3 bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md text-sm flex items-start">
+                                    <HelpCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
+                                    <span>
+                                        Your application is on a public URL. Copy this Callback URL and paste it into your Meta App's webhook configuration.
+                                    </span>
+                                </div>
+                            )}
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium">Verify Token</label>
-                            <div className="flex items-center mt-1">
-                                <input type="text" value={settings.whatsappVerifyToken || 'Save credentials to generate a token'} readOnly className="w-full border rounded-l-md p-2 bg-gray-100 dark:bg-gray-700/50 font-mono text-xs" />
-                                <button onClick={() => copyToClipboard(settings.whatsappVerifyToken || '')} disabled={!settings.whatsappVerifyToken} className="p-2 border border-l-0 rounded-r-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 disabled:opacity-50"><Copy size={16} /></button>
+                            <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-900/30 border dark:border-gray-700 rounded-md text-sm text-gray-600 dark:text-gray-300 space-y-3">
+                                <p>You must create a secure secret token and configure it in both your application environment and your Meta App settings. This ensures that webhook requests are genuinely from Meta.</p>
+
+                                <button type="button" onClick={generateToken} className="text-sm font-semibold text-blue-600 hover:underline">
+                                    Generate a Secure Token
+                                </button>
+
+                                {generatedToken && (
+                                    <div className="space-y-2 pt-2">
+                                        <div className="flex items-center">
+                                            <input type="text" value={generatedToken} readOnly className="w-full border rounded-l-md p-2 bg-gray-100 dark:bg-gray-700/50 font-mono text-xs" />
+                                            <button type="button" onClick={() => copyToClipboard(generatedToken)} className="p-2 border border-l-0 rounded-r-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500"><Copy size={16} /></button>
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold">Next Steps:</p>
+                                            <ol className="list-decimal list-inside space-y-1 mt-1">
+                                                <li>Copy the generated token above.</li>
+                                                <li>Set it as the <code className="font-mono text-xs bg-black/10 dark:bg-black/30 px-1 rounded">WHATSAPP_VERIFY_TOKEN</code> environment variable in your application's hosting environment.</li>
+                                                <li>Paste the exact same token into the "Verify token" field in your Meta App's webhook configuration.</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

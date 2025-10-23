@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-import crypto from "crypto";
+import { encrypt } from "@/lib/crypto";
 
 export async function GET() {
   const session = await getAuthSession();
@@ -16,12 +16,16 @@ export async function GET() {
         whatsappPhoneNumberId: true,
         whatsappBusinessAccountId: true,
         whatsappAccessToken: true,
-        whatsappVerifyToken: true,
       },
     });
 
-    // Return empty object if no settings, so frontend can show empty form
-    return NextResponse.json(settings || {});
+    const settingsToReturn = { ...settings };
+    // Never send the actual token to the client. Send a placeholder.
+    if (settingsToReturn?.whatsappAccessToken) {
+      settingsToReturn.whatsappAccessToken = "••••••••••••••••••••••••••••••••";
+    }
+
+    return NextResponse.json(settingsToReturn || {});
   } catch (error) {
     console.error("GET /api/settings/whatsapp error:", error);
     return NextResponse.json(
@@ -46,51 +50,50 @@ export async function POST(req: Request) {
       whatsappAccessToken,
     } = body;
 
-    if (
-      !whatsappPhoneNumberId ||
-      !whatsappBusinessAccountId ||
-      !whatsappAccessToken
-    ) {
+    if (!whatsappPhoneNumberId || !whatsappBusinessAccountId) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Phone Number ID and Business Account ID are required" },
         { status: 400 }
       );
     }
 
-    const existingSettings = await prisma.settings.findUnique({
-      where: { userId },
-    });
+    const updateData: any = {
+      whatsappPhoneNumberId,
+      whatsappBusinessAccountId,
+    };
 
-    let verifyToken = existingSettings?.whatsappVerifyToken;
-    if (!verifyToken) {
-      // Generate a unique, secure token if one doesn't exist
-      verifyToken = crypto.randomBytes(20).toString("hex");
+    // Only update the token if a new, non-placeholder value is provided.
+    if (whatsappAccessToken && !whatsappAccessToken.startsWith("•")) {
+      updateData.whatsappAccessToken = encrypt(whatsappAccessToken);
     }
+
+    const createData = {
+      userId,
+      whatsappPhoneNumberId,
+      whatsappBusinessAccountId,
+      ...(whatsappAccessToken &&
+        !whatsappAccessToken.startsWith("•") && {
+          whatsappAccessToken: encrypt(whatsappAccessToken),
+        }),
+    };
 
     const updatedSettings = await prisma.settings.upsert({
       where: { userId },
-      update: {
-        whatsappPhoneNumberId,
-        whatsappBusinessAccountId,
-        whatsappAccessToken, // Note: In a production app, encrypt this value before saving!
-        whatsappVerifyToken: verifyToken,
-      },
-      create: {
-        userId,
-        whatsappPhoneNumberId,
-        whatsappBusinessAccountId,
-        whatsappAccessToken,
-        whatsappVerifyToken: verifyToken,
-      },
+      update: updateData,
+      create: createData,
       select: {
         whatsappPhoneNumberId: true,
         whatsappBusinessAccountId: true,
         whatsappAccessToken: true,
-        whatsappVerifyToken: true,
       },
     });
 
-    return NextResponse.json(updatedSettings);
+    const settingsToReturn = { ...updatedSettings };
+    if (settingsToReturn.whatsappAccessToken) {
+      settingsToReturn.whatsappAccessToken = "••••••••••••••••••••••••••••••••";
+    }
+
+    return NextResponse.json(settingsToReturn);
   } catch (error) {
     console.error("POST /api/settings/whatsapp error:", error);
     return NextResponse.json(

@@ -1,7 +1,7 @@
 // src/components/Dashboard.tsx
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { DashboardData } from '../types';
 import { Socket } from 'socket.io-client';
 import KpiCard from './dashboard/KpiCard';
@@ -36,8 +36,50 @@ const itemVariants = {
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
-    // In a real app, you might use the socket to update this data in real-time
-    const data = initialData;
+    const [data, setData] = useState(initialData);
+    // FIX: Changed NodeJS.Timeout to ReturnType<typeof setTimeout> for browser compatibility.
+    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const refreshDashboardData = useCallback(async () => {
+        try {
+            const res = await fetch('/api/dashboard');
+            if (res.ok) {
+                const newData = await res.json();
+                setData(newData);
+            }
+        } catch (error) {
+            console.error("Failed to refresh dashboard data", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleUpdate = () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+            // Debounce the refresh to avoid too many calls in a short period
+            debounceTimer.current = setTimeout(() => {
+                refreshDashboardData();
+            }, 1000); // 1-second debounce window
+        };
+
+        const eventsToListen = ['new_lead', 'newMessage', 'order_update', 'quotation_update'];
+
+        eventsToListen.forEach(event => {
+            (socket as any).on(event, handleUpdate);
+        });
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+            eventsToListen.forEach(event => {
+                (socket as any).off(event, handleUpdate);
+            });
+        };
+    }, [socket, refreshDashboardData]);
 
     // FIX: Map revenue data to the format expected by AnalyticsChart (label, value) to resolve TypeScript error.
     const formattedRevenueData = data.revenueLast7Days.map(item => ({

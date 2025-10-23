@@ -1161,6 +1161,12 @@ video {
 .resize-none {
   resize: none;
 }
+.list-inside {
+  list-style-position: inside;
+}
+.list-decimal {
+  list-style-type: decimal;
+}
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -2144,11 +2150,11 @@ video {
   /* ✨ NEW: "Sunrise Glow" Theme ✨ */
   --background: #FFFBF5; /* Almond white */
   --card-background: #FFFFFF;
-  --card-border: #FDEFE5; /* Soft peach-tinted border */
+  --card-border: #FDEFEF5; /* Soft peach-tinted border */
   --input-background: #FFFFFF;
   --sidebar-background: #FFFFFF;
   --header-background: #FFFFFF;
-  --header-border: #FDEFE5;
+  --header-border: #FDEFEF5;
   --text-primary: #5D4037; /* Deep Brown */
   --text-secondary: #795548; /* Medium Brown */
   --text-tertiary: #A1887F; /* Light Brown */
@@ -2244,7 +2250,8 @@ body {
 
 .chat-bubble.outgoing {
   background-color: var(--outgoing-bubble-bg);
-  color: #000000;
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 .dark .chat-bubble.outgoing {
   /* Use primary text color for high contrast on dark teal */
@@ -2262,18 +2269,18 @@ body {
 
 /* Animations */
 @keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
-    animation: fade-in-up 0.3s ease-out forwards;
+  animation: fade-in-up 0.3s ease-out forwards;
 }
 
 /* Highlight effect for scrolled-to message */
@@ -2288,17 +2295,17 @@ body {
 
 
 .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 /* VyaparConnect Loader Animations */
@@ -2633,6 +2640,12 @@ body {
 .dark\:bg-yellow-900\/30:is(.dark *) {
   background-color: rgb(113 63 18 / 0.3);
 }
+.dark\:bg-black\/30:is(.dark *) {
+  background-color: rgb(0 0 0 / 0.3);
+}
+.dark\:bg-gray-900\/30:is(.dark *) {
+  background-color: rgb(17 24 39 / 0.3);
+}
 .dark\:from-gray-800:is(.dark *) {
   --tw-gradient-from: #1f2937 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(31 41 55 / 0) var(--tw-gradient-to-position);
@@ -2912,3 +2925,4 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+

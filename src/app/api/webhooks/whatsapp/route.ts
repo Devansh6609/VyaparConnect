@@ -84,20 +84,26 @@ export async function GET(req: NextRequest) {
   const token = searchParams.get("hub.verify_token");
   const challenge = searchParams.get("hub.challenge");
 
-  if (mode === "subscribe" && token) {
-    // Find a user with this verify token
-    const settings = await prisma.settings.findFirst({
-      where: { whatsappVerifyToken: token },
-    });
+  // Use a global verify token from environment variables
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
 
-    if (settings) {
-      console.log(`✅ WhatsApp Webhook Verified for user ${settings.userId}`);
-      return new NextResponse(challenge ?? "", { status: 200 });
-    }
+  // It's crucial to have this token set in your environment.
+  if (!verifyToken) {
+    console.error(
+      "❌ FATAL: WHATSAPP_VERIFY_TOKEN is not set in environment variables. Webhook verification will fail."
+    );
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
+  if (mode === "subscribe" && token === verifyToken) {
+    console.log(
+      "✅ WhatsApp Webhook Verified successfully using global token."
+    );
+    return new NextResponse(challenge ?? "", { status: 200 });
   }
 
   console.error(
-    "❌ WhatsApp Webhook Verification Failed. Mode or token incorrect."
+    "❌ WhatsApp Webhook Verification Failed. The token received did not match the expected token."
   );
   return new NextResponse("Forbidden", { status: 403 });
 }

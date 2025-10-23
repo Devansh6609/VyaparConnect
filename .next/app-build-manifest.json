@@ -16,30 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/loading.js"
     ],
-    "/chat/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/chat/page.js"
-    ],
-    "/orders/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/orders/page.js"
-    ],
-    "/broadcasts/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/broadcasts/page.js"
-    ],
-    "/groups/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/groups/page.js"
-    ],
     "/settings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/settings/page.js"
+    ],
+    "/settings/whatsapp/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/settings/whatsapp/page.js"
     ]
   }
 }
