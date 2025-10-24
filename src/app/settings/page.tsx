@@ -1,3 +1,4 @@
+
 // src/app/settings/page.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
@@ -301,6 +302,12 @@ const SettingsPage = () => {
                     </div>
                 </motion.div>
             </motion.form>
+
+            <div className="mt-8 max-w-4xl mx-auto text-center text-sm text-gray-500 dark:text-gray-400">
+                <Link href="/privacy-policy" className="hover:underline">
+                    Read our Privacy Policy
+                </Link>
+            </div>
         </div>
     );
 };

@@ -1,9 +1,10 @@
 
-
 "use client";
 import React, { useState, useEffect } from 'react';
 import { UserCog, Lock, Save, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+// FIX: Import `Variants` type from framer-motion to correctly type animation variants.
+import { motion, type Variants } from 'framer-motion';
+import Link from 'next/link';
 
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -12,14 +13,16 @@ interface UserProfile {
     email: string;
 }
 
-const containerVariants = {
+// FIX: Explicitly type with `Variants` to satisfy framer-motion's expected type.
+const containerVariants: Variants = {
     hidden: {},
     visible: {
         transition: { staggerChildren: 0.1 },
     },
 };
 
-const itemVariants = {
+// FIX: Explicitly type with `Variants` to satisfy framer-motion's expected type.
+const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 },
 };
@@ -120,9 +123,10 @@ const ProfilePage: React.FC = () => {
     return (
         <div className="p-6 md:p-8 bg-gray-50/50 dark:bg-gray-900/50 min-h-full">
             <motion.div
+                // FIX: Restored framer-motion props to re-enable animations.
                 initial="hidden"
                 animate="visible"
-                variants={itemVariants}
+                variants={containerVariants}
             >
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Profile</h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your personal information and password.</p>
@@ -130,6 +134,7 @@ const ProfilePage: React.FC = () => {
 
             <motion.div
                 className="mt-8 max-w-4xl mx-auto space-y-8"
+                // FIX: Restored framer-motion props to re-enable animations.
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -138,6 +143,7 @@ const ProfilePage: React.FC = () => {
                 <motion.form
                     onSubmit={handleInfoSubmit}
                     className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50"
+                    // FIX: Restored framer-motion props to re-enable animations.
                     variants={itemVariants}
                 >
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center"><UserCog className="mr-2 text-blue-600" /> Personal Information</h2>
@@ -169,6 +175,7 @@ const ProfilePage: React.FC = () => {
                 <motion.form
                     onSubmit={handlePasswordSubmit}
                     className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50"
+                    // FIX: Restored framer-motion props to re-enable animations.
                     variants={itemVariants}
                 >
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center"><Lock className="mr-2 text-purple-600" /> Change Password</h2>
@@ -200,6 +207,12 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </motion.form>
             </motion.div>
+
+            <div className="mt-8 max-w-4xl mx-auto text-center text-sm text-gray-500 dark:text-gray-400">
+                <Link href="/privacy-policy" className="hover:underline">
+                    Read our Privacy Policy
+                </Link>
+            </div>
         </div>
     );
 };

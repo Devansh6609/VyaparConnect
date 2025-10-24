@@ -19,7 +19,8 @@ import Modal from "./ui/Modal";
 import AddProductForm from "./AddProductForm";
 import EditProductForm from "./EditProductForm";
 import QuotationPreviewModal from "@/components/QuotationPreviewModal";
-import { motion, AnimatePresence } from "framer-motion";
+// FIX: Import `Variants` type from framer-motion to correctly type animation variants.
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useSession } from "next-auth/react";
 
 interface RightPanelProps {
@@ -34,7 +35,8 @@ interface RightPanelProps {
 
 type ViewId = 'main_menu' | 'products' | 'quotations' | 'new_quotation' | 'billing' | 'master_customer_details' | 'order_history' | 'new_order' | 'order_summary' | 'order_billing' | 'new_reminder';
 
-const viewTransitionVariants = {
+// FIX: Explicitly type with `Variants` to satisfy framer-motion's expected type for `ease`.
+const viewTransitionVariants: Variants = {
     initial: { opacity: 0, y: 10 },
     enter: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
     exit: { opacity: 0, y: -10, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } },
@@ -47,7 +49,8 @@ const menuContainerVariants = {
         },
     },
 };
-const menuItemVariants = {
+// FIX: Explicitly type with `Variants` to satisfy framer-motion's expected type for `ease`.
+const menuItemVariants: Variants = {
     hidden: { y: 15, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { ease: 'easeOut', duration: 0.3 } },
 };
@@ -314,7 +317,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                             products={products}
                             onShareProduct={onShareProduct}
                             onEditProduct={(p) => setProductToEdit(p)}
-                            onDeleteProduct={(p) => setProductToDelete(p)}
+                            onDeleteProduct={(p) => setProductToEdit(p)}
                         />
                     </div>
                 );
@@ -432,8 +435,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
                                 onClick={btn.action}
                                 disabled={btn.disabled}
                                 className={`w-full flex items-center p-3 text-left rounded-lg transition-colors ${btn.disabled
-                                    ? 'bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                                    : 'bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700'
+                                        ? 'bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                        : 'bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700'
                                     }`}
                                 title={btn.disabled ? `${btn.label} (Disabled in this workspace)` : btn.label}
                             >

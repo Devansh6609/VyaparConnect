@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import type { DashboardData } from '@/types';
+// FIX: Changed path alias for types import to a relative path to fix module resolution error.
+import type { DashboardData } from '../types';
 import { Socket } from 'socket.io-client';
 import KpiCard from './dashboard/KpiCard';
 import AnalyticsChart from './dashboard/AnalyticsChart';
@@ -68,7 +69,8 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
         const eventsToListen: (keyof ServerToClientEvents)[] = ['new_lead', 'newMessage', 'order_update', 'quotation_update'];
 
         eventsToListen.forEach(event => {
-            socket.on(event, handleUpdate);
+            // FIX: Cast `event` to string to resolve TypeScript error with socket.io-client typings.
+            socket.on(event as string, handleUpdate);
         });
 
         return () => {
@@ -76,7 +78,8 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
                 clearTimeout(debounceTimer.current);
             }
             eventsToListen.forEach(event => {
-                socket.off(event, handleUpdate);
+                // FIX: Cast `event` to string to resolve TypeScript error with socket.io-client typings.
+                socket.off(event as string, handleUpdate);
             });
         };
     }, [socket, refreshDashboardData]);

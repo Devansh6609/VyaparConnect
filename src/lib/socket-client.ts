@@ -1,7 +1,8 @@
 "use client";
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
-import type { Contact, Message, Quotation, Order } from "@/types";
+// FIX: Changed path alias for types import to a relative path to fix module resolution error.
+import type { Contact, Message, Quotation, Order } from "../types";
 
 // Define the events the server will send to the client
 export interface ServerToClientEvents {

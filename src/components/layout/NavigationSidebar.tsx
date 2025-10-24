@@ -49,6 +49,7 @@ const NavigationSidebar: React.FC = () => {
   const workflow = session.user.primaryWorkflow;
 
 
+
   return (
     <aside className="w-16 bg-white dark:bg-[var(--card-background)] border-r border-gray-200 dark:border-[var(--card-border)] flex flex-col items-center py-4">
       <div className="p-2 mb-4">
@@ -86,8 +87,8 @@ const NavigationSidebar: React.FC = () => {
               href={item.href}
               key={item.href}
               className={`flex flex-col items-center justify-center w-14 h-14 rounded-lg transition-colors duration-200 ${isActive
-                  ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
+                ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               title={item.label}
             >
@@ -105,8 +106,8 @@ const NavigationSidebar: React.FC = () => {
               href={item.href}
               key={item.href}
               className={`flex flex-col items-center justify-center w-14 h-14 rounded-lg transition-colors duration-200 ${isActive
-                  ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
+                ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               title={item.label}
             >

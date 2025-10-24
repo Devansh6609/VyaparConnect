@@ -1,17 +1,18 @@
+// src/middleware.ts
+
 export { default } from "next-auth/middleware";
 
 export const config = {
+  // Corrected matcher to exclude public pages from NextAuth middleware
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api/auth (NextAuth API routes)
-     * - api/webhooks (Webhook routes, which need to be public)
-     * - login (the login page)
-     * - signup (the signup page)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - /api/auth, /api/webhooks, /_next, /favicon.ico
+     * And the following exact public routes:
+     * - /login, /signup, /privacy-policy
+     * * NOTE: Next.js matchers are applied to the URL path *only*.
+     * The regex below ensures the paths are excluded from authentication.
      */
-    "/((?!api/auth|api/webhooks|login|signup|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/auth|_next|favicon.ico|login|signup|privacy-policy|api/webhooks).*)",
   ],
 };

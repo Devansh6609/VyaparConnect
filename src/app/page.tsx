@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Dashboard from '@/components/Dashboard';
-// FIX: Used type-only import to prevent module resolution errors.
-import type { DashboardData } from '@/types';
+// FIX: Changed path alias for types import to a relative path to fix module resolution error.
+import type { DashboardData } from '../types';
 import { getSocket } from '@/lib/socket-client';
 import type { Socket } from 'socket.io-client';
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
