@@ -146,7 +146,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
 
     return (
-        <div className="bg-gray-100 dark:bg-[var(--header-background)] p-4 border-t border-gray-200 dark:border-[var(--card-border)] relative">
+        <div className="bg-gray-100 dark:bg-[var(--header-background)] p-2 sm:p-4 border-t border-gray-200 dark:border-[var(--card-border)] relative">
             <AnimatePresence>
                 {(isFetchingReplies || smartReplies.length > 0) && (
                     <motion.div
@@ -213,9 +213,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     )}
                 </div>
             )}
-            <div className="flex items-center space-x-3 bg-white dark:bg-[var(--input-background)] px-4 py-3 rounded-3xl shadow-sm">
+            <div className="flex items-center space-x-2 sm:space-x-3 bg-white dark:bg-[var(--input-background)] px-3 py-2 sm:px-4 sm:py-3 rounded-full shadow-sm">
                 <button onClick={() => setIsAiPromptOpen(!isAiPromptOpen)} className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full transition-colors" title="Ask VyaparAI">
-                    <Sparkles className="w-5 h-5" />
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <div className="relative">
                     {showEmojiPicker && (
@@ -225,7 +225,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                         />
                     )}
                     <button onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full transition-colors">
-                        <Smile className="w-5 h-5" />
+                        <Smile className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                 </div>
 
@@ -241,7 +241,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                         </div>
                     )}
                     <button onClick={() => setShowAttachmentMenu(!showAttachmentMenu)} className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full transition-colors">
-                        <Paperclip className="w-5 h-5" />
+                        <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                 </div>
 
@@ -266,9 +266,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 <button
                     onClick={() => handleSendMessage()}
                     disabled={!newMessage?.trim() && !fileToSend}
-                    className="p-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 rounded-full transition-colors flex-shrink-0"
+                    className="p-2 sm:p-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 rounded-full transition-colors flex-shrink-0"
                 >
-                    <Send className="w-5 h-5 text-white" />
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </button>
             </div>
         </div>

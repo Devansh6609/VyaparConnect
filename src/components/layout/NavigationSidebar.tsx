@@ -10,6 +10,7 @@ import Icon, { type IconName } from '@/components/ui/Icon';
 
 const bottomNavItems = [
   { href: '/settings', label: 'Settings', icon: 'settings' as IconName },
+  { href: '/pricing', label: 'Pricing', icon: 'creditCard' as IconName },
   { href: '/profile', label: 'Profile', icon: 'user' as IconName },
 ];
 
@@ -49,7 +50,7 @@ const NavigationSidebar: React.FC = () => {
 
 
   return (
-    <aside className="w-20 bg-white dark:bg-[var(--card-background)] border-r border-gray-200 dark:border-[var(--card-border)] flex flex-col items-center py-4">
+    <aside className="w-16 bg-white dark:bg-[var(--card-background)] border-r border-gray-200 dark:border-[var(--card-border)] flex flex-col items-center py-4">
       <div className="p-2 mb-4">
         <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
           V
@@ -71,11 +72,11 @@ const NavigationSidebar: React.FC = () => {
             return (
               <div
                 key={item.href}
-                className="flex flex-col items-center justify-center w-16 h-16 rounded-lg text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                className="flex flex-col items-center justify-center w-14 h-14 rounded-lg text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
                 title={`${item.label} (Disabled in this workspace)`}
               >
-                <Icon name={item.icon} size={24} />
-                <span className="text-[10px] mt-1">{item.label}</span>
+                <Icon name={item.icon} size={20} />
+                <span className="text-[9px] mt-1">{item.label}</span>
               </div>
             );
           }
@@ -84,14 +85,14 @@ const NavigationSidebar: React.FC = () => {
             <Link
               href={item.href}
               key={item.href}
-              className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg transition-colors duration-200 ${isActive
+              className={`flex flex-col items-center justify-center w-14 h-14 rounded-lg transition-colors duration-200 ${isActive
                   ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               title={item.label}
             >
-              <Icon name={item.icon} size={24} />
-              <span className="text-[10px] mt-1">{item.label}</span>
+              <Icon name={item.icon} size={20} />
+              <span className="text-[9px] mt-1">{item.label}</span>
             </Link>
           );
         })}
@@ -103,24 +104,24 @@ const NavigationSidebar: React.FC = () => {
             <Link
               href={item.href}
               key={item.href}
-              className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg transition-colors duration-200 ${isActive
+              className={`flex flex-col items-center justify-center w-14 h-14 rounded-lg transition-colors duration-200 ${isActive
                   ? 'bg-blue-100 text-blue-600 dark:bg-[var(--incoming-bubble-bg)] dark:text-blue-400'
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               title={item.label}
             >
-              <Icon name={item.icon} size={24} />
-              <span className="text-[10px] mt-1">{item.label}</span>
+              <Icon name={item.icon} size={20} />
+              <span className="text-[9px] mt-1">{item.label}</span>
             </Link>
           );
         })}
         <button
           onClick={() => signOut()}
-          className="flex flex-col items-center justify-center w-16 h-16 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400"
+          className="flex flex-col items-center justify-center w-14 h-14 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400"
           title="Sign Out"
         >
-          <Icon name="lock" size={24} />
-          <span className="text-[10px] mt-1">Sign Out</span>
+          <Icon name="lock" size={20} />
+          <span className="text-[9px] mt-1">Sign Out</span>
         </button>
       </div>
     </aside>

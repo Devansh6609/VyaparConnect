@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Message } from '../types';
+import type { Message } from '@/types';
 import { Trash2 } from 'lucide-react';
 
 interface DeleteConfirmationModalProps {

@@ -376,9 +376,10 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
             const isProductMessage = message.type === "product" && !!message.product;
 
             return (
-                // FIX: Removed framer-motion props (`initial`, `animate`, `exit`, `transition`) to resolve TypeScript errors. This may affect animations.
-                // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
-                <motion.div key={message.id}>
+                // FIX: Removed framer-motion props to resolve TypeScript errors. This may affect animations.
+                <motion.div
+                    key={message.id}
+                >
                     {showDate && (
                         <div className="text-center my-4">
                             <span className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow text-gray-600 dark:text-gray-300 text-xs font-semibold px-3 py-1 rounded-full">
@@ -462,12 +463,12 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
         <div
             className="w-full flex flex-col h-full"
         >
-            <header className="bg-white dark:bg-[var(--header-background)] p-4 border-b border-gray-200 dark:border-[var(--card-border)] shadow-sm flex items-center justify-between z-10">
+            <header className="bg-white dark:bg-[var(--header-background)] px-2 py-3 sm:p-4 border-b border-gray-200 dark:border-[var(--card-border)] shadow-sm flex items-center justify-between z-10">
                 <div className="flex items-center min-w-0">
                     <button onClick={onBack} className="mr-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden" aria-label="Back to chat list">
                         <Icon name="arrowLeft" size={20} />
                     </button>
-                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                    <div className="w-9 h-9 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                         <span className="font-bold text-gray-600 dark:text-gray-300">
                             {(chat.name || "?").charAt(0).toUpperCase()}
                         </span>
@@ -512,7 +513,7 @@ const ChatView: React.FC<ChatViewProps> = ({ chat, onPromoteCustomer, messages =
                 </div>
             </header>
             <main className="flex-1 relative chat-background">
-                <div ref={messagesContainerRef} className="absolute inset-0 overflow-y-auto p-4">
+                <div ref={messagesContainerRef} className="absolute inset-0 overflow-y-auto p-2 sm:p-4">
                     <div ref={topMessageRef} className="h-1" />
                     {isLoadingMore && <div className="text-center py-2"><Loader2 className="animate-spin text-gray-500" /></div>}
                     <AnimatePresence>

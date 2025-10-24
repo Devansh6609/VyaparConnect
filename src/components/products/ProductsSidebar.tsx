@@ -54,17 +54,12 @@ const ProductsSidebar: React.FC<ProductsSidebarProps> = ({
   }
 
   return (
-    <motion.div
+    <div
       className="p-2"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
     >
       {products.map((product) => (
-        <motion.div
+        <div
           key={product.id}
-          variants={itemVariants}
-          layout
           className="p-2 mb-2 border dark:border-gray-700 rounded-lg flex items-center hover:bg-gray-50 dark:hover:bg-gray-700/50"
         >
           <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover rounded-md mr-3 flex-shrink-0" />
@@ -98,9 +93,9 @@ const ProductsSidebar: React.FC<ProductsSidebarProps> = ({
               <Icon name="trash2" size={16} />
             </button>
           </div>
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 };
 

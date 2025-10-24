@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Quotation } from '../types';
+import type { Quotation } from '@/types';
 import { X, Send, Loader2, AlertCircle } from 'lucide-react';
 
 interface QuotationPreviewModalProps {

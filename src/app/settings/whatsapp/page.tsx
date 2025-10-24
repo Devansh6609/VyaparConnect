@@ -148,7 +148,8 @@ const WhatsAppSettingsPage = () => {
                     </div>
                 )}
 
-                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50">
+                {/* FIX: Removed framer-motion props (`variants`) due to TypeScript error. This may affect animations. */}
+                <motion.div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Step 1: Enter Your API Credentials</h2>
                     <div className="p-3 bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md text-sm flex items-start mb-4">
                         <HelpCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
@@ -188,7 +189,8 @@ const WhatsAppSettingsPage = () => {
                     </form>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50">
+                {/* FIX: Removed framer-motion props (`variants`) due to TypeScript error. This may affect animations. */}
+                <motion.div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100/50 dark:border-gray-700/50">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Step 2: Configure Webhook in Meta</h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Copy the following values and paste them into your Meta App's webhook configuration page.</p>
 

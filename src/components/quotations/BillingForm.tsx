@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-// FIX: Used type-only import to prevent module resolution errors.
 import type { Quotation, Payment } from '../../types';
 import { Send, Link as LinkIcon, Banknote, QrCode, Plus, Loader2 } from 'lucide-react';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { format } from 'date-fns';
 import Modal from '../ui/Modal';
 
@@ -63,9 +62,9 @@ const BillingForm: React.FC<BillingFormProps> = ({ quotation, onBack, onFinalize
                     setPayments(updatedQuotation.payments || []);
                 }
             };
-            (socket as any).on('quotation_update', handleQuotationUpdate);
+            socket.on('quotation_update', handleQuotationUpdate);
             return () => {
-                (socket as any).off('quotation_update', handleQuotationUpdate);
+                socket.off('quotation_update', handleQuotationUpdate);
             };
         }
     }, [currentQuotation.id, socket]);

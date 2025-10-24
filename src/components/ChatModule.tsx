@@ -1,13 +1,13 @@
 
 
+
 "use client";
 
 import React from "react";
-// FIX: Corrected import path for ChatList.tsx to resolve module resolution error.
 import ChatList from "./ChatList";
 import ChatView from "./ChatView";
-// FIX: Used type-only import to prevent module resolution errors.
-import type { Contact, Message } from "../types";
+// FIX: Changed relative import path for types to use the path alias '@' for consistency and to resolve potential module resolution errors.
+import type { Contact, Message } from "@/types";
 import type { Socket } from "socket.io-client";
 
 interface ChatModuleProps {

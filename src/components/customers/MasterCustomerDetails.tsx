@@ -1,9 +1,7 @@
-
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import type { Contact, ContactDetails, Tag as TagType } from '../../types';
+import type { Contact, ContactDetails, Tag as TagType } from '@/types';
 import { Save, Loader2, Star, Edit as EditIcon, UserX } from 'lucide-react';
 import TagManager from './TagManager';
 import Tag from '../ui/Tag';
@@ -140,73 +138,67 @@ const MasterCustomerDetails: React.FC<MasterCustomerDetailsProps> = ({ contact, 
 
     if (isEditing) {
         return (
-            <motion.form
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+            <form
                 onSubmit={handleSaveChanges}
                 className="p-4 space-y-4"
             >
-                <motion.h3 variants={itemVariants} className="font-semibold flex items-center text-yellow-500">
+                <h3 className="font-semibold flex items-center text-yellow-500">
                     <Star size={18} className="mr-2 fill-current" />
                     {detailedContact?.isMasterCustomer ? 'Edit Master Details' : 'Promote to Master Customer'}
-                </motion.h3>
+                </h3>
                 {error && <p className="text-red-600 bg-red-50 p-2 rounded-md text-sm">{error}</p>}
 
-                <motion.div variants={itemVariants}>
+                <div>
                     <label className="text-sm font-medium">Customer Name <span className="text-red-500">*</span></label>
                     <input type="text" value={formData.name} onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))} className="mt-1 w-full border rounded-md p-2 text-sm dark:bg-[var(--input-background)] dark:border-gray-600" required />
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </div>
+                <div>
                     <label className="text-sm font-medium">Shipping Address <span className="text-red-500">*</span></label>
                     <textarea value={formData.shippingAddress} onChange={(e) => setFormData(p => ({ ...p, shippingAddress: e.target.value }))} rows={3} className="mt-1 w-full border rounded-md p-2 text-sm dark:bg-[var(--input-background)] dark:border-gray-600" placeholder="Enter full shipping address..." required />
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </div>
+                <div>
                     <label className="text-sm font-medium">Bank Account Details</label>
                     <textarea value={formData.bankDetails} onChange={(e) => setFormData(p => ({ ...p, bankDetails: e.target.value }))} rows={3} className="mt-1 w-full border rounded-md p-2 text-sm dark:bg-[var(--input-background)] dark:border-gray-600" placeholder="Bank Name, Account Number, IFSC Code..." />
-                </motion.div>
+                </div>
 
-                <motion.div variants={itemVariants}>
+                <div>
                     <TagManager tags={formData.tags} onTagsChange={(newTags) => setFormData(p => ({ ...p, tags: newTags }))} />
-                </motion.div>
+                </div>
 
-                <motion.div variants={itemVariants} className="flex justify-end gap-2 pt-2">
+                <div className="flex justify-end gap-2 pt-2">
                     {detailedContact?.isMasterCustomer && <button type="button" onClick={handleCancelEdit} className="px-4 py-2 text-sm border dark:border-gray-600 rounded-md">Cancel</button>}
                     <button type="submit" disabled={isSaving} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-50 flex items-center">
                         {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
                         {isSaving ? 'Saving...' : 'Save Details'}
                     </button>
-                </motion.div>
-            </motion.form>
+                </div>
+            </form>
         );
     }
 
     // Read-only view
     return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+        <div
             className="p-4 space-y-4"
         >
-            <motion.div variants={containerVariants} className="space-y-3">
-                <motion.div variants={itemVariants}>
+            <div className="space-y-3">
+                <div>
                     <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">Tags</label>
                     <div className="flex flex-wrap gap-2 items-center mt-1">
                         {detailedContact?.tags?.map(tag => <Tag key={tag.id} name={tag.name} color={tag.color} />)}
                         {detailedContact?.tags?.length === 0 && <p className="text-sm text-gray-400 dark:text-gray-500 italic">No tags</p>}
                     </div>
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </div>
+                <div>
                     <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">Shipping Address</label>
                     <p className="text-sm whitespace-pre-wrap p-2 bg-gray-50 dark:bg-[var(--input-background)] rounded-md mt-1">{detailedContact?.shippingAddress || <span className="italic text-gray-400 dark:text-gray-500">Not provided</span>}</p>
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </div>
+                <div>
                     <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">Bank Details</label>
                     <p className="text-sm whitespace-pre-wrap p-2 bg-gray-50 dark:bg-[var(--input-background)] rounded-md mt-1">{detailedContact?.bankDetails || <span className="italic text-gray-400 dark:text-gray-500">Not provided</span>}</p>
-                </motion.div>
-            </motion.div>
-            <motion.div variants={itemVariants} className="flex justify-between items-center pt-2">
+                </div>
+            </div>
+            <div className="flex justify-between items-center pt-2">
                 <button
                     type="button"
                     onClick={handleDemote}
@@ -219,8 +211,8 @@ const MasterCustomerDetails: React.FC<MasterCustomerDetailsProps> = ({ contact, 
                 <button onClick={() => setIsEditing(true)} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md flex items-center">
                     <EditIcon size={16} className="mr-2" /> Edit Details
                 </button>
-            </motion.div>
-        </motion.div>
+            </div>
+        </div>
     );
 };
 

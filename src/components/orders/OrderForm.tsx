@@ -95,7 +95,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ contact, onCancel, onOrderCreated
         }
     };
 
-    const subtotal = state.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0)), 0);
+    const subtotal = state.items.reduce((sum, item) => sum + ((!isNaN(parseFloat(item.quantity)) ? parseFloat(item.quantity) : 0) * (parseFloat(item.price) || 0)), 0);
     const discountAmount = (subtotal * (parseFloat(state.discountPercentage) || 0)) / 100;
     const total = subtotal - discountAmount + (parseFloat(state.deliveryCharges) || 0);
 
@@ -148,7 +148,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ contact, onCancel, onOrderCreated
 
     return (
         <form onSubmit={handleSubmit} className="p-4">
-            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 mb-4">New Order</h3>
             {error && <p className="text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-300 p-2 rounded-md text-sm mb-4">{error}</p>}
 
             <div className="space-y-3 text-sm">
@@ -159,39 +158,58 @@ const OrderForm: React.FC<OrderFormProps> = ({ contact, onCancel, onOrderCreated
 
             <div className="mt-4">
                 <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-100">Items</h4>
-                <div className="space-y-2">
-                    {state.items.map((item) => (
-                        <div key={item.id} className="grid grid-cols-[1fr,80px,80px,100px,auto] gap-2 items-center">
-                            <input
-                                list="product-list"
-                                type="text"
-                                value={item.productName}
-                                onChange={e => handleItemProductChange(item.id, e.target.value)}
-                                placeholder="Product Name"
-                                className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                                required
-                            />
-                            <input
-                                type="text"
-                                value={item.quantity}
-                                onChange={e => dispatch({ type: 'UPDATE_ITEM', id: item.id, field: 'quantity', payload: e.target.value })}
-                                placeholder="Qty"
-                                className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                                required
-                            />
-                            <input
-                                type="number"
-                                value={item.price}
-                                onChange={e => dispatch({ type: 'UPDATE_ITEM', id: item.id, field: 'price', payload: e.target.value })}
-                                placeholder="Price"
-                                step="0.01"
-                                className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                                required
-                            />
-                            <span className="text-sm font-semibold text-right pr-2 dark:text-gray-200">
-                                ₹{((parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0)).toFixed(2)}
-                            </span>
-                            <button type="button" onClick={() => dispatch({ type: 'REMOVE_ITEM', id: item.id })}><Trash2 size={16} className="text-red-500 hover:text-red-600" /></button>
+                <div className="space-y-3">
+                    {state.items.map((item, index) => (
+                        <div key={item.id} className="p-3 border rounded-lg dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/30">
+                            <div className="flex justify-between items-start mb-2">
+                                <input
+                                    list="product-list"
+                                    type="text"
+                                    value={item.productName}
+                                    onChange={e => handleItemProductChange(item.id, e.target.value)}
+                                    placeholder={`Item #${index + 1} Name`}
+                                    className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 font-medium"
+                                    required
+                                />
+                                <button type="button" onClick={() => dispatch({ type: 'REMOVE_ITEM', id: item.id })} className="ml-2 p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full flex-shrink-0">
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap items-end gap-2">
+                                <div className="flex-1 min-w-[80px]">
+                                    <label htmlFor={`quantity-${item.id}`} className="text-xs text-gray-500">Quantity</label>
+                                    <input
+                                        id={`quantity-${item.id}`}
+                                        type="text"
+                                        value={item.quantity}
+                                        onChange={e => dispatch({ type: 'UPDATE_ITEM', id: item.id, field: 'quantity', payload: e.target.value })}
+                                        placeholder="e.g., 1 or 250g"
+                                        className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 mt-1"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-[100px]">
+                                    <label htmlFor={`price-${item.id}`} className="text-xs text-gray-500">Price (₹)</label>
+                                    <input
+                                        id={`price-${item.id}`}
+                                        type="number"
+                                        value={item.price}
+                                        onChange={e => dispatch({ type: 'UPDATE_ITEM', id: item.id, field: 'price', payload: e.target.value })}
+                                        placeholder="Unit Price"
+                                        step="0.01"
+                                        className="w-full border rounded-md p-2 text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 mt-1"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-[100px]">
+                                    <label className="text-xs text-gray-500 text-right block">Subtotal</label>
+                                    <div className="flex items-center justify-end px-2 rounded-md bg-gray-200/70 dark:bg-gray-800/70 h-10 mt-1">
+                                        <span className="text-sm font-semibold text-right dark:text-gray-200">
+                                            ₹{((!isNaN(parseFloat(item.quantity)) ? parseFloat(item.quantity) : 0) * (parseFloat(item.price) || 0)).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -199,7 +217,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ contact, onCancel, onOrderCreated
                     {products.map(p => <option key={p.id} value={p.name} />)}
                 </datalist>
 
-                <button type="button" onClick={() => dispatch({ type: 'ADD_ITEM' })} className="flex items-center text-sm text-blue-600 dark:text-blue-400 mt-2"><Plus size={16} className="mr-1" /> Add Item</button>
+                <button type="button" onClick={() => dispatch({ type: 'ADD_ITEM' })} className="flex items-center text-sm text-blue-600 dark:text-blue-400 mt-3"><Plus size={16} className="mr-1" /> Add Item</button>
             </div>
 
             <div className="mt-6 space-y-3">

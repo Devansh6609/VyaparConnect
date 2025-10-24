@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Loader2, Trash2, Edit, HelpCircle, MessageSquare } from 'lucide-react';
 // FIX: Corrected import path for types to use a relative path.
-import type { Group } from '../../types';
+import type { Group } from '@/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import AddGroupModal from '@/components/groups/AddGroupModel';
+import AddGroupModal from '../../components/groups/AddGroupModel';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -95,14 +95,12 @@ const GroupsPage = () => {
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Click 'Register Group' to start managing a WhatsApp group.</p>
                 </div>
             ) : (
-                <motion.div
+                <div
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
                 >
                     {groups.map(group => (
-                        <motion.div
+                        <div
                             key={group.id}
-                            // FIX: Removed framer-motion props (`variants`) due to TypeScript error. This may affect animations.
                             className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between"
                         >
                             <div>
@@ -123,9 +121,9 @@ const GroupsPage = () => {
                                     <MessageSquare size={16} className="mr-2" /> Open Chat
                                 </Link>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
-                </motion.div>
+                </div>
             )}
 
             {isModalOpen && (

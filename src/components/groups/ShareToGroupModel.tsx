@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '@/components/ui/Modal';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Product } from '../../types';
+import type { Product } from '@/types';
 import { Loader2, Send } from 'lucide-react';
 
 interface Group {

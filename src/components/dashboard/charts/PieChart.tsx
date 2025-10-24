@@ -59,14 +59,10 @@ const PieChart: React.FC<PieChartProps> = ({ data = [] }) => {
             <div className="relative">
                 <svg width="150" height="150" viewBox="0 0 150 150">
                     {slices.map((slice, index) => (
-                        <motion.path
+                        <path
                             key={slice.label}
                             d={slice.path}
                             fill={STAGE_CONFIG[slice.label]?.color || STAGE_CONFIG.Unknown.color}
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                            whileHover={{ scale: 1.05 }}
                             onMouseEnter={() => setHoveredSlice(slice)}
                             onMouseLeave={() => setHoveredSlice(null)}
                         />
@@ -74,17 +70,13 @@ const PieChart: React.FC<PieChartProps> = ({ data = [] }) => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <AnimatePresence mode="wait">
-                        <motion.div
+                        <div
                             key={hoveredLabel}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
                             className="text-center"
                         >
                             <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{hoveredValue.toLocaleString()}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{hoveredLabel}</p>
-                        </motion.div>
+                        </div>
                     </AnimatePresence>
                 </div>
             </div>

@@ -19,8 +19,7 @@ import Modal from "./ui/Modal";
 import AddProductForm from "./AddProductForm";
 import EditProductForm from "./EditProductForm";
 import QuotationPreviewModal from "@/components/QuotationPreviewModal";
-// FIX: Add Variants type to fix type inference issues
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 
 interface RightPanelProps {
@@ -35,22 +34,20 @@ interface RightPanelProps {
 
 type ViewId = 'main_menu' | 'products' | 'quotations' | 'new_quotation' | 'billing' | 'master_customer_details' | 'order_history' | 'new_order' | 'order_summary' | 'order_billing' | 'new_reminder';
 
-// FIX: Add explicit Variants type to fix type inference issues
-const viewTransitionVariants: Variants = {
+const viewTransitionVariants = {
     initial: { opacity: 0, y: 10 },
     enter: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
     exit: { opacity: 0, y: -10, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } },
 };
 
-const menuContainerVariants: Variants = {
+const menuContainerVariants = {
     visible: {
         transition: {
             staggerChildren: 0.06,
         },
     },
 };
-// FIX: Add explicit Variants type to fix type inference issues
-const menuItemVariants: Variants = {
+const menuItemVariants = {
     hidden: { y: 15, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { ease: 'easeOut', duration: 0.3 } },
 };
@@ -422,12 +419,16 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 }
 
                 content = (
-                    // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) to resolve TypeScript errors. This may affect animations.
-                    <motion.div className="p-4 space-y-3">
+                    <motion.div
+                        className="p-4 space-y-3"
+                        variants={menuContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         {workflowButtons.map(btn => (
-                            // FIX: Removed framer-motion prop `variants` to resolve TypeScript error. This may affect animations.
                             <motion.button
                                 key={btn.id}
+                                variants={menuItemVariants}
                                 onClick={btn.action}
                                 disabled={btn.disabled}
                                 className={`w-full flex items-center p-3 text-left rounded-lg transition-colors ${btn.disabled
@@ -439,16 +440,13 @@ const RightPanel: React.FC<RightPanelProps> = ({
                                 {btn.icon} {btn.label}
                             </motion.button>
                         ))}
-                        {/* FIX: Removed framer-motion prop `variants` to resolve TypeScript error. This may affect animations. */}
-                        <motion.button onClick={handleSuggestProducts} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
+                        <motion.button variants={menuItemVariants} onClick={handleSuggestProducts} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
                             <Lightbulb className="mr-3 text-yellow-500 dark:text-yellow-400" /> Suggest Products
                         </motion.button>
-                        {/* FIX: Removed framer-motion prop `variants` to resolve TypeScript error. This may affect animations. */}
-                        <motion.button onClick={() => setView('products')} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
+                        <motion.button variants={menuItemVariants} onClick={() => setView('products')} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
                             <Package className="mr-3 text-orange-600 dark:text-orange-400" /> Share Product
                         </motion.button>
-                        {/* FIX: Removed framer-motion prop `variants` to resolve TypeScript error. This may affect animations. */}
-                        <motion.button onClick={() => setView('master_customer_details')} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
+                        <motion.button variants={menuItemVariants} onClick={() => setView('master_customer_details')} className="w-full flex items-center p-3 text-left bg-gray-50 hover:bg-gray-100 dark:bg-[var(--input-background)] dark:hover:bg-gray-700 rounded-lg">
                             <UserCheck className="mr-3 text-purple-600 dark:text-purple-400" /> Customer Details
                         </motion.button>
                     </motion.div>
@@ -456,22 +454,25 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 break;
         }
 
-        return (
-            <AnimatePresence mode="wait">
-                {/* FIX: Removed framer-motion props (`variants`, `initial`, `animate`, `exit`) to resolve TypeScript errors. This may affect animations. */}
-                <motion.div key={view}>
-                    {content}
-                </motion.div>
-            </AnimatePresence>
-        );
+        return content;
     };
 
     return (
-        <aside className="w-full md:w-[30%] md:min-w-[350px] md:max-w-[450px] bg-white dark:bg-[var(--header-background)] border-l border-gray-200 dark:border-[var(--card-border)] flex flex-col flex-shrink-0">
+        <aside className="w-full md:w-[30%] md:min-w-[380px] md:max-w-[450px] bg-white dark:bg-[var(--header-background)] border-l border-gray-200 dark:border-[var(--card-border)] flex flex-col flex-shrink-0">
             {renderHeader()}
             <div className="flex-1 overflow-y-auto">
                 {productError && <div className="p-4 m-2 bg-red-50 text-red-700 rounded-md text-sm">{productError}</div>}
-                {renderContent()}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={view}
+                        variants={viewTransitionVariants}
+                        initial="initial"
+                        animate="enter"
+                        exit="exit"
+                    >
+                        {renderContent()}
+                    </motion.div>
+                </AnimatePresence>
             </div>
 
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Product">

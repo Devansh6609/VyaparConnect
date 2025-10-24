@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '@/components/ui/Modal';
 // FIX: Used type-only import with path alias to prevent module resolution errors.
-import type { Quotation } from '../../types';
+import type { Quotation } from '@/types';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';

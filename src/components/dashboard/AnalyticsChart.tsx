@@ -154,10 +154,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ revenueData, funnelData
                             </button>
                             <AnimatePresence>
                                 {isFilterOpen && (
-                                    <motion.div
-                                        // FIX: Removed framer-motion props (`initial`, `animate`, `exit`) due to TypeScript error. This may affect animations.
-                                        className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-xl z-10 p-2"
-                                    >
+                                    <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-xl z-10 p-2">
                                         <button onClick={() => handleFilterSelect('today')} className="w-full text-left text-sm px-3 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Today</button>
                                         <button onClick={() => handleFilterSelect('7d')} className="w-full text-left text-sm px-3 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Last 7 Days</button>
                                         <button onClick={() => handleFilterSelect('30d')} className="w-full text-left text-sm px-3 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Last 30 Days</button>
@@ -168,7 +165,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ revenueData, funnelData
                                             <input type="date" value={customRange.to} onChange={e => setCustomRange(p => ({ ...p, to: e.target.value }))} className="w-full border rounded-md text-xs p-1 dark:bg-gray-700 dark:border-gray-600" />
                                             <button onClick={handleCustomRangeApply} className="w-full bg-blue-600 text-white text-xs py-1.5 rounded">Apply</button>
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 )}
                             </AnimatePresence>
                         </div>

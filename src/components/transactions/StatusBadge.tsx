@@ -1,7 +1,7 @@
 // src/components/transactions/StatusBadge.tsx
 import React from 'react';
 // FIX: Used type-only import with path alias to prevent module resolution errors.
-import type { QuotationStatus } from '../../types';
+import type { QuotationStatus } from '@/types';
 
 interface StatusBadgeProps {
     status: QuotationStatus;

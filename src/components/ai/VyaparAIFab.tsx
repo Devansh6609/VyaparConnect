@@ -8,16 +8,14 @@ const VyaparAIFab: React.FC = () => {
     const { openModal } = useAIModal();
 
     return (
-        <motion.button
+        <button
             onClick={openModal}
             className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 rounded-full text-white flex items-center justify-center shadow-lg z-40"
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9 }}
             aria-label="Open Vyapar AI Assistant"
             title="Vyapar AI"
         >
             <Icon name="sparkles" size={28} />
-        </motion.button>
+        </button>
     );
 };
 

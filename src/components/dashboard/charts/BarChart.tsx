@@ -1,3 +1,4 @@
+
 // src/components/dashboard/charts/BarChart.tsx
 "use client";
 
@@ -84,10 +85,7 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
 
                         return (
                             <g key={item.label}>
-                                <motion.rect
-                                    initial={{ height: 0, y: chartHeight }}
-                                    animate={{ height: barHeight, y: y }}
-                                    transition={{ duration: 0.5, delay: index * 0.05, type: 'spring', stiffness: 100 }}
+                                <rect
                                     x={x}
                                     width={barWidth}
                                     rx={3}
@@ -95,6 +93,8 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
                                     className="text-blue-500 hover:text-blue-700 dark:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                     onMouseOver={(e) => handleMouseOver(e, item)}
                                     onMouseLeave={() => setTooltip(null)}
+                                    y={y}
+                                    height={barHeight}
                                 />
                                 {index % labelSkipInterval === 0 && (
                                     <text x={x + barWidth / 2} y={chartHeight + 15} textAnchor="middle" fontSize="12" className="fill-current text-gray-500 dark:text-gray-400">
@@ -108,11 +108,7 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
             </svg>
             <AnimatePresence>
                 {tooltip && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                    <div
                         style={{
                             position: 'fixed',
                             top: tooltip.y,
@@ -122,7 +118,7 @@ const BarChart: React.FC<BarChartProps> = ({ data = [], isCurrency }) => {
                         className="bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg pointer-events-none z-10"
                     >
                         <p className="font-bold whitespace-nowrap">{isCurrency ? '₹' : ''}{tooltip.data.value.toLocaleString('en-IN')}</p>
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

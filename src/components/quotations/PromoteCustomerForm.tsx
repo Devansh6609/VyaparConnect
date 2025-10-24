@@ -1,14 +1,8 @@
-
-
-
-
-
-
 "use client";
 
 import React, { useState } from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Contact } from '../../types';
+import type { Contact } from '@/types';
 import { Save, Loader2 } from 'lucide-react';
 
 interface PromoteCustomerFormProps {

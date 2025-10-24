@@ -1,6 +1,6 @@
 import React from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Message, ProductImage } from '../types';
+import type { Message, ProductImage } from '@/types';
 import { format } from 'date-fns';
 import { Clock, Check, CheckCheck, X } from 'lucide-react';
 

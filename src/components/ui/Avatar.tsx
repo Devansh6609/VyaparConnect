@@ -7,7 +7,7 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ initials, className = '' }) => {
   return (
-    <div className={`flex items-center justify-center h-10 w-10 rounded-full bg-gray-300 text-gray-600 font-bold ${className}`}>
+    <div className={`flex items-center justify-center h-9 w-9 rounded-full bg-gray-300 text-gray-600 font-bold ${className}`}>
       {initials}
     </div>
   );

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Order, Payment } from '../../types';
 import { Send, Link as LinkIcon, Banknote, QrCode, Plus, Loader2 } from 'lucide-react';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { format } from 'date-fns';
 import Modal from '../ui/Modal';
 
@@ -46,7 +46,7 @@ const OrderBillingForm: React.FC<OrderBillingFormProps> = ({ order, onBack, onFi
                 }
             };
             socket.on('order_update', handleOrderUpdate);
-            return () => { (socket as any).off('order_update', handleOrderUpdate); };
+            return () => { socket.off('order_update', handleOrderUpdate); };
         }
     }, [currentOrder.id, socket]);
 

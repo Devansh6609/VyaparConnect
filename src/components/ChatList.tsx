@@ -138,9 +138,8 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
                 });
             };
 
-            // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' and 'off' methods.
-            (socket as any).on('newMessage', handleNewMessage);
-            return () => { (socket as any).off('newMessage', handleNewMessage); };
+            socket.on('newMessage', handleNewMessage);
+            return () => { socket.off('newMessage', handleNewMessage); };
         }
     }, [socket, activeContactId, fetchChats, selectedTagIds]);
 
@@ -193,15 +192,14 @@ const ChatList: React.FC<ChatListProps> = ({ socket, activeContactId, onSelectCh
             </div>
             <div className="flex-1 overflow-y-auto">
                 {loading && chats.length === 0 ? <ChatListSkeleton /> : (
-                    // FIX: Removed framer-motion props (`variants`, `initial`, `animate`) to resolve TypeScript errors. This may affect animations.
-                    <motion.ul>
+                    <motion.ul variants={listVariants} initial="hidden" animate="visible">
                         <AnimatePresence>
                             {filteredChats.map((chat, index) => (
-                                // FIX: Removed framer-motion props (`variants`, `exit`, `transition`) to resolve TypeScript errors. This may affect animations.
-                                // FIX: The 'layout' prop is not valid here and causes a TypeScript error. Removing it may affect animations.
                                 <motion.li
                                     ref={index === filteredChats.length - 1 ? lastChatElementRef : null}
                                     key={chat.id}
+                                    variants={itemVariants}
+                                    exit="exit"
                                     onClick={() => onSelectChat(chat)}
                                     className={`p-3 cursor-pointer border-b border-gray-200 dark:border-[var(--card-border)] hover:bg-gray-50 dark:hover:bg-[var(--input-background)] transition-colors ${activeContactId === chat.id ? 'bg-blue-50 dark:bg-[var(--incoming-bubble-bg)]' : ''}`}
                                 >

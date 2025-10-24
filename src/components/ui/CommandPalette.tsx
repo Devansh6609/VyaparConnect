@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCommandK, openCommandPalette } from '@/hooks/useCommandK';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Contact, Product } from '../../types';
+import type { Contact, Product } from '@/types';
 import { Search, Package, User, FileText, Settings, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from './Avatar';
@@ -119,11 +119,7 @@ export default function CommandPalette() {
                     className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20"
                     onClick={() => setIsOpen(false)}
                 >
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.2 }}
+                    <div
                         className="w-full max-w-xl bg-white dark:bg-gray-800 rounded-lg shadow-2xl border dark:border-gray-700 overflow-hidden"
                         onClick={e => e.stopPropagation()}
                         onKeyDown={handleKeyDown}
@@ -161,7 +157,7 @@ export default function CommandPalette() {
                                 <li className="text-center p-4 text-sm text-gray-500">No results found.</li>
                             )}
                         </ul>
-                    </motion.div>
+                    </div>
                 </div>
             )}
         </AnimatePresence>

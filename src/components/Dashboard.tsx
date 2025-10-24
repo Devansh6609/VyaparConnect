@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import type { DashboardData } from '../types';
+import type { DashboardData } from '@/types';
 import { Socket } from 'socket.io-client';
 import KpiCard from './dashboard/KpiCard';
 import AnalyticsChart from './dashboard/AnalyticsChart';
@@ -13,6 +13,7 @@ import FollowUpCenter from './dashboard/FollowUpCenter';
 import PendingOrders from './dashboard/PendingOrders';
 import AiInsights from './dashboard/AiInsights';
 import ActionItems from './dashboard/ActionItems';
+import type { ServerToClientEvents } from '@/lib/socket-client';
 
 interface DashboardProps {
     initialData: DashboardData;
@@ -37,7 +38,6 @@ const itemVariants = {
 
 const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
     const [data, setData] = useState(initialData);
-    // FIX: Changed NodeJS.Timeout to ReturnType<typeof setTimeout> for browser compatibility.
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const refreshDashboardData = useCallback(async () => {
@@ -64,11 +64,11 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
                 refreshDashboardData();
             }, 1000); // 1-second debounce window
         };
-
-        const eventsToListen = ['new_lead', 'newMessage', 'order_update', 'quotation_update'];
+        // FIX: Use the exported ServerToClientEvents type to correctly type the event names.
+        const eventsToListen: (keyof ServerToClientEvents)[] = ['new_lead', 'newMessage', 'order_update', 'quotation_update'];
 
         eventsToListen.forEach(event => {
-            (socket as any).on(event, handleUpdate);
+            socket.on(event, handleUpdate);
         });
 
         return () => {
@@ -76,12 +76,11 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
                 clearTimeout(debounceTimer.current);
             }
             eventsToListen.forEach(event => {
-                (socket as any).off(event, handleUpdate);
+                socket.off(event, handleUpdate);
             });
         };
     }, [socket, refreshDashboardData]);
 
-    // FIX: Map revenue data to the format expected by AnalyticsChart (label, value) to resolve TypeScript error.
     const formattedRevenueData = data.revenueLast7Days.map(item => ({
         label: item.day,
         value: item.revenue,
@@ -92,7 +91,7 @@ const Dashboard: React.FC<DashboardProps> = ({ initialData, socket }) => {
             <motion.div
                 initial="hidden"
                 animate="visible"
-                variants={itemVariants}
+                variants={containerVariants}
             >
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Dashboard</h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Here's a snapshot of your business activity.</p>

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TransactionCard from '@/components/transactions/TransactionCard';
 import TransactionDetailModal from '@/components/transactions/TransactionDetailModal';
 import FilterModal from '@/components/transactions/FilterModal';
-import { Transaction, QuotationStatus } from '../../types';
+import type { Transaction, QuotationStatus } from '@/types';
 import Icon from '@/components/ui/Icon';
 import TransactionsPageSkeleton from '../../components/skeletons/TranjectionPageSkeleton';
 
@@ -65,8 +65,7 @@ const QuotationsPage: React.FC = () => {
 
     return (
         <div className="p-6 md:p-8 bg-gray-50/50 dark:bg-transparent min-h-full">
-            <motion.div
-                // FIX: Removed framer-motion props (`initial`, `animate`, `transition`) due to TypeScript error. This may affect animations.
+            <div
                 className="flex justify-between items-center mb-6"
             >
                 <div>
@@ -81,13 +80,12 @@ const QuotationsPage: React.FC = () => {
                         <Icon name="filter" size={16} className="mr-2" /> Filter
                     </button>
                 </div>
-            </motion.div>
+            </div>
 
             {error && <p className="text-red-500 bg-red-100 p-3 rounded-md text-center mb-4">{error}</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <motion.div
-                    // FIX: Removed framer-motion props (`layout`, `variants`, `initial`, `animate`) due to TypeScript error. This may affect animations.
+                <div
                     className="lg:col-span-3 space-y-4"
                 >
                     <AnimatePresence>
@@ -109,7 +107,7 @@ const QuotationsPage: React.FC = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </motion.div>
+                </div>
                 <div className="lg:col-span-1">
                     <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
                         <p className="text-5xl font-bold text-blue-600">{activeTransactionsCount}</p>

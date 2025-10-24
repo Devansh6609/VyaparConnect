@@ -8,7 +8,7 @@ import TransactionCard from '@/components/transactions/TransactionCard';
 import TransactionDetailModal from '@/components/transactions/TransactionDetailModal';
 import FilterModal from '@/components/transactions/FilterModal';
 // FIX: Used type-only import with path alias to prevent module resolution errors.
-import type { Transaction, QuotationStatus } from '../../types';
+import type { Transaction, QuotationStatus } from '@/types';
 import Icon from '@/components/ui/Icon';
 import TransactionsPageSkeleton from '../../components/skeletons/TranjectionPageSkeleton';
 

@@ -6,9 +6,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Dashboard from '@/components/Dashboard';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { DashboardData } from '../types';
+import type { DashboardData } from '@/types';
 import { getSocket } from '@/lib/socket-client';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 
 export default function HomePage() {

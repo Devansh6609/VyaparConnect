@@ -1,7 +1,8 @@
 
+
 import React from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Contact } from '../../types';
+import type { Contact } from '@/types';
 import { MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';

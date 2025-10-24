@@ -1,8 +1,7 @@
-
 "use client";
 import React, { useState } from 'react';
 // FIX: Corrected import path for types to use a relative path.
-import type { FollowUpItem } from '../../types';
+import type { FollowUpItem } from '@/types';
 import { Send, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Icon from '@/components/ui/Icon';

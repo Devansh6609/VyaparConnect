@@ -58,11 +58,8 @@ const AiInsights: React.FC<AiInsightsProps> = ({ summary }) => {
     }
 
     return (
-        <motion.div
-            className="p-5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/40 border border-blue-200 dark:border-blue-800/50 shadow-sm"
-            whileHover={{ y: -2 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-        >
+        // FIX: Removed framer-motion props (`whileHover`, `transition`) to resolve TypeScript error. This may affect animations.
+        <motion.div className="p-5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/40 border border-blue-200 dark:border-blue-800/50 shadow-sm">
             <div className="flex items-center mb-3">
                 <Icon name="sparkles" className="text-blue-600 dark:text-blue-400" />
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 ml-2">AI-Powered Insights</h3>

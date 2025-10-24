@@ -5,8 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from 'next/navigation';
 import ChatModule from "@/components/ChatModule";
 import RightPanel from "@/components/RightPanel";
-// FIX: Used type-only import to prevent module resolution errors.
-import type { Contact, Product, Message } from "../../types";
+import type { Contact, Product, Message } from "@/types";
 import { getSocket } from "@/lib/socket-client";
 import type { Socket } from "socket.io-client";
 import ChatPageSkeleton from "@/components/skeletons/ChatPageSkeleton";
@@ -131,18 +130,16 @@ function ChatPageContent() {
             }
         };
 
-        // FIX: Cast socket to 'any' to resolve TypeScript error for 'on' method.
-        (socket as any).on("newMessage", handleNewMessage);
-        (socket as any).on("message-status-update", handleStatusUpdate);
-        (socket as any).on("deleteMessage", handleDeleteMessage);
-        (socket as any).on("contact_updated", handleContactUpdate);
+        socket.on("newMessage", handleNewMessage);
+        socket.on("message-status-update", handleStatusUpdate);
+        socket.on("deleteMessage", handleDeleteMessage);
+        socket.on("contact_updated", handleContactUpdate);
 
         return () => {
-            // FIX: Cast socket to 'any' to resolve TypeScript error for 'off' method.
-            (socket as any).off("newMessage", handleNewMessage);
-            (socket as any).off("message-status-update", handleStatusUpdate);
-            (socket as any).off("deleteMessage", handleDeleteMessage);
-            (socket as any).off("contact_updated", handleContactUpdate);
+            socket.off("newMessage", handleNewMessage);
+            socket.off("message-status-update", handleStatusUpdate);
+            socket.off("deleteMessage", handleDeleteMessage);
+            socket.off("contact_updated", handleContactUpdate);
         };
     }, [socket, activeContact, awaitingAddressResponseForOrder]);
 

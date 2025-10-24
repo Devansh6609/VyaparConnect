@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
-// FIX: Changed path alias to relative path to resolve module resolution error.
-import type { WorkflowType } from "../types";
+import type { WorkflowType } from "@/types";
 
 interface AddProductFormProps {
     // We no longer need the userId prop for creation

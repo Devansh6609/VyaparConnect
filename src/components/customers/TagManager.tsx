@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 // FIX: Corrected import path for types to use a path alias.
-import type { Tag as TagType } from '../../types';
+import type { Tag as TagType } from '@/types';
 import Tag from '../ui/Tag';
 import { Plus } from 'lucide-react';
 

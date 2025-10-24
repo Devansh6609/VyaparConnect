@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
-// FIX: Changed path alias to relative path to resolve module resolution error.
-import { WorkflowType } from "../../../types";
+import { WorkflowType } from "@/types";
 
 // GET /api/products → list all products for the logged-in user, filtered by workflow
 export async function GET() {

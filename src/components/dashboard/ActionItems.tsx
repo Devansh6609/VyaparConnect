@@ -1,7 +1,6 @@
-
 import React from 'react';
 // FIX: Used type-only import to prevent module resolution errors.
-import type { PendingPaymentItem } from '../../types';
+import type { PendingPaymentItem } from '@/types';
 import { MessageCircle, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';

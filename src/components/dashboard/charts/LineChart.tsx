@@ -75,10 +75,7 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
                 </g>
 
                 {/* Line and Points */}
-                <motion.path
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 1, ease: 'easeInOut' }}
+                <path
                     d={pathData}
                     fill="none"
                     stroke="currentColor"
@@ -96,14 +93,12 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
                                 onMouseOver={(e) => handleMouseOver(e, data[index])}
                                 onMouseLeave={() => setTooltip(null)}
                             />
-                            <motion.circle
-                                initial={{ r: 0 }}
-                                animate={{ r: 4 }}
-                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            <circle
                                 cx={point.x}
                                 cy={point.y}
                                 fill="currentColor"
                                 className="text-blue-500 pointer-events-none"
+                                r="4"
                             />
                             {index % labelSkipInterval === 0 && (
                                 <text x={point.x} y={chartHeight + padding.top + 20} textAnchor="middle" fontSize="12" className="fill-current text-gray-500 dark:text-gray-400">
@@ -116,11 +111,7 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
             </svg>
             <AnimatePresence>
                 {tooltip && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                    <div
                         style={{
                             position: 'fixed',
                             top: tooltip.y,
@@ -130,7 +121,7 @@ const LineChart: React.FC<LineChartProps> = ({ data = [], isCurrency }) => {
                         className="bg-gray-800 text-white text-sm rounded-lg py-1 px-3 shadow-lg pointer-events-none z-10"
                     >
                         <p className="font-bold whitespace-nowrap">{isCurrency ? '₹' : ''}{tooltip.data.value.toLocaleString('en-IN')}</p>
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

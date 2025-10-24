@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 // FIX: Used type-only import with path alias to prevent module resolution errors.
-import type { Transaction } from '../../types';
+import type { Transaction } from '@/types';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
 import { Eye, MessageCircle } from 'lucide-react';
@@ -22,8 +22,7 @@ const itemVariants = {
 
 const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, onViewDetails }) => {
     return (
-        <motion.div
-            // FIX: Removed `layout` and `variants` props due to TypeScript error. This may affect animations.
+        <div
             className="bg-white dark:bg-[var(--card-background)] p-4 rounded-lg shadow-sm border dark:border-[var(--card-border)] hover:shadow-md transition-shadow duration-200 flex flex-col"
         >
             <div className="flex-grow grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
@@ -67,7 +66,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, onViewDe
                     </button>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 

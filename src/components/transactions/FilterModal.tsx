@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 // FIX: Used type-only import with path alias to prevent module resolution errors.
-import type { QuotationStatus } from '../../types';
+import type { QuotationStatus } from '@/types';
 
 interface FilterModalProps {
     isOpen: boolean;

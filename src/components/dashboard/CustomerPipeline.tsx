@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 // FIX: Corrected import path for types to use a relative path.
-import type { CustomerPipelineItem } from '../../types';
+import type { CustomerPipelineItem } from '@/types';
 import Icon from '@/components/ui/Icon';
 import Link from 'next/link';
 

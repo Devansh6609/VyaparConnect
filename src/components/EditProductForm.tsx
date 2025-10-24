@@ -1,9 +1,9 @@
+
 "use client";
 
 import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
-// FIX: Changed path alias to relative path to resolve module resolution error.
-import type { WorkflowType } from "../types";
+import type { WorkflowType } from "@/types";
 
 interface ProductImage {
     id: string;

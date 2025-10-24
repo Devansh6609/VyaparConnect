@@ -9,7 +9,7 @@ import {
 } from "@/lib/whatsapp";
 import { getAuthSession } from "@/lib/auth";
 // FIX: Used type-only import to prevent module resolution errors.
-import type { Contact } from "../../../../types";
+import type { Contact } from "@/types";
 
 async function getUserWhatsAppCredentials(
   userId: string

@@ -72,18 +72,15 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, summary, i
                         <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Generating summary...</p>
                     </div>
                 ) : (
-                    <motion.div
+                    <div
                         className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
-                        variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-                        initial="hidden"
-                        animate="visible"
                     >
                         {summary.split('\n').map((line, index) => (
-                            <motion.div key={index} variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+                            <div key={index}>
                                 <LineRenderer line={line} />
-                            </motion.div>
+                            </div>
                         ))}
-                    </motion.div>
+                    </div>
                 )}
             </div>
             <div className="flex justify-end mt-4 pt-4 border-t dark:border-gray-700">

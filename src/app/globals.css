@@ -23,11 +23,11 @@
   /* ✨ NEW: "Sunrise Glow" Theme ✨ */
   --background: #FFFBF5; /* Almond white */
   --card-background: #FFFFFF;
-  --card-border: #FDEFEF5; /* Soft peach-tinted border */
+  --card-border: #FDEFE5; /* Soft peach-tinted border */
   --input-background: #FFFFFF;
   --sidebar-background: #FFFFFF;
   --header-background: #FFFFFF;
-  --header-border: #FDEFEF5;
+  --header-border: #FDEFE5;
   --text-primary: #5D4037; /* Deep Brown */
   --text-secondary: #795548; /* Medium Brown */
   --text-tertiary: #A1887F; /* Light Brown */
@@ -108,11 +108,12 @@ body {
 
 /* Chat Bubble Styles */
 .chat-bubble {
-    @apply max-w-xl rounded-lg relative shadow-sm break-words px-3 py-2;
+    @apply max-w-xl rounded-lg relative shadow-sm break-words px-2.5 py-1.5 sm:px-3 sm:py-2;
 }
 
 .chat-bubble.outgoing {
-  @apply bg-[var(--outgoing-bubble-bg)] text-black;
+  background-color: var(--outgoing-bubble-bg);
+  color: #000000;
 }
 .dark .chat-bubble.outgoing {
   /* Use primary text color for high contrast on dark teal */
@@ -124,23 +125,24 @@ body {
 }
 
 .chat-bubble.incoming {
-  @apply bg-[var(--incoming-bubble-bg)] text-[var(--text-primary)];
+  background-color: var(--incoming-bubble-bg);
+  color: var(--text-primary);
 }
 
 /* Animations */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.3s ease-out forwards;
+    animation: fade-in-up 0.3s ease-out forwards;
 }
 
 /* Highlight effect for scrolled-to message */
@@ -155,17 +157,17 @@ body {
 
 
 .line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
 }
 
 /* VyaparConnect Loader Animations */

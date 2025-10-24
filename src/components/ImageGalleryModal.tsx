@@ -5,8 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-// FIX: Used type-only import to prevent module resolution errors.
-import type { ProductImage } from '../types';
+import type { ProductImage } from '@/types';
 
 interface ImageGalleryModalProps {
     images: ProductImage[];
@@ -75,11 +74,11 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({ images, startInde
                     key={currentIndex}
                     src={images[currentIndex].url}
                     alt={`Product image ${currentIndex + 1}`}
-                    className="max-w-[90vw] max-h-[90vh] object-contain"
-                    initial={{ opacity: 0.8, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0.8, scale: 0.95 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
+                    className="max-w-[90vw] max-h-[90vh] object-contain"
                     onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking image
                 />
             </AnimatePresence>

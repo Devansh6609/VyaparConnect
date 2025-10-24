@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 // FIX: Replaced Prisma enums with local types from `src/types.ts` due to import errors.
-import type { OrderStatus, OrderPaymentStatus } from "../../../../types";
+import type { OrderStatus, OrderPaymentStatus } from "@/types";
 
 // Runtime values for validation, matching src/types.ts
 const ALL_ORDER_STATUSES: OrderStatus[] = [

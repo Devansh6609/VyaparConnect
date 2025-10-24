@@ -3,7 +3,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-// FIX: Use alias path for consistency.
 import Icon, { IconName } from '@/components/ui/Icon';
 
 interface KpiCardProps {
@@ -52,9 +51,9 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, icon, isCurrency = fals
 
   return (
     <motion.div
-      className="bg-white dark:bg-[var(--card-background)] p-5 rounded-xl shadow-sm border border-gray-100/50 dark:border-[var(--card-border)] hover:shadow-lg transition-shadow duration-300 flex items-start space-x-4"
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -5 }}
       transition={{ type: 'spring', stiffness: 300 }}
+      className="bg-white dark:bg-[var(--card-background)] p-5 rounded-xl shadow-sm border border-gray-100/50 dark:border-[var(--card-border)] hover:shadow-lg transition-shadow duration-300 flex items-start space-x-4"
     >
       <div className="bg-blue-100 text-blue-600 p-3 rounded-lg">
         <Icon name={icon} size={24} />
